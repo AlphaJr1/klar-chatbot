@@ -1,0 +1,89 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+
+# Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.hypothesis/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.spyderproject
+.spyproject
+.ropeproject
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Session logs archive
+session_logs/archive/
+
+# Temp files
+*.tmp
+*.bak
+*.orig
+*.log
+*.pid
+
+# Node.js (untuk server2_1.js)
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Data Storage
+data/storage/memory.json
+data/storage/logs/*.jsonl
+data/storage/logs/llm_log.json
+data/storage/qdrant/
+data/storage/conversations.json
+data/storage/backups/*
+!data/storage/backups/.gitkeep
+
+# Agent temporary files
+.agent/analysis/
+.agent/guides/
+
+# Runtime Logs
+logs/*
+!logs/.gitkeep
+.ngrok_url
+
+# Backup files
+*_backup/
+*.backup
+backup_*/

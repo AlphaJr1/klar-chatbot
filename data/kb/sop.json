@@ -1,0 +1,247 @@
+{
+  "metadata": {
+    "version": "3.0",
+    "updated_at": "2025-11-20",
+    "description": "Honeywell EAC Troubleshooting SOP with multi-templates",
+    "general_templates": {
+      "greeting": [
+        "Halo kak,",
+        "Halo Pak/Bu,",
+        "Baik kak,",
+        "Baik Pak/Bu, saya bantu ya.",
+        "Siang kak,"
+      ],
+      "clarify": [
+        "Boleh dijelaskan sedikit lagi kak supaya saya bisa bantu lebih tepat?",
+        "Saya kurang menangkap maksudnya kak, boleh diperjelas sedikit?",
+        "Bisa dijelaskan sedikit lagi kak, biar saya cekkan kondisinya."
+      ],
+      "closing_resolved": [
+        "Baik kak, kalau alat sudah berfungsi normal, saya tutup laporannya ya.",
+        "Sip kak, kalau sudah oke alatnya, saya close tiketnya ya.",
+        "Kalau sudah normal kembali, saya tutup laporannya ya kak."
+      ],
+      "closing_pending": [
+        "Baik kak, saya teruskan ke teknisi ya.",
+        "Kasusnya saya proses untuk dicek teknisi ya kak.",
+        "Saya bantu jadwalkan teknisi untuk pengecekan ya kak."
+      ],
+      "transition": [
+        "Baik kak, kita cek satu hal lagi ya.",
+        "Oke kak, saya bantu pandu pelan-pelan ya.",
+        "Baik, kita lanjut cek tahap berikutnya."
+      ]
+    }
+  },
+  "mati": {
+    "intent": "mati",
+    "label": "Mati / Tidak Menyala",
+    "category": "troubleshoot",
+    "steps": [
+      {
+        "id": "cek_tutup",
+        "order": 1,
+        "type": "binary",
+        "description": "Penutup tidak rapat dapat membuat alat tidak menyala.",
+        "ask_templates": [
+          "Sepertinya penutup unit belum terpasang rapat. Mohon matikan listrik unit, pastikan cover terpasang dengan rapat, lalu nyalakan kembali. Jika sudah rapat biasanya unit langsung menyala normal. Kalau masih bermasalah, silakan hubungi kami kembali ya kak.",
+          "Coba cek cover nya ya kak. Kalau belum tertutup rapat, bisa dicoba untuk pasang ulang sampai rapat, lalu nyalakan lagi. biasanya langsung normal. Silakan hubungi kami kembali kalo masi bermasalah ya kak.",
+          "Unit tidak menyala biasanya sering disebabkan karena covernya tidak rapat. Coba matikan dulu, pastikan cover tertutup dengan rapat, lalu nyalakan lagi. Mohon infokan ke kami ya kalau sudah menyala."
+        ],
+        "instruct_templates": [
+          "Silakan dirapatkan dulu penutup alatnya ya kak.",
+          "Coba rapatkan kembali cover alatnya kak.",
+          "Mohon dirapatkan dulu penutupnya kak."
+        ],
+        "confirm_templates": [
+          "Kalau sudah dirapatkan, apakah alatnya sudah menyala kak?",
+          "Setelah cover dipastikan rapat, apakah alatnya sudah berfungsi kak?",
+          "Kalau sudah dikunci rapat, apakah alatnya sudah nyala kak?"
+        ],
+        "resolve_templates": [
+          "Baik kak, kalau sudah nyala kembali saya tutup laporannya ya.",
+          "Sip kak, kalau alat sudah kembali menyala, saya close laporannya ya.",
+          "Kalau sudah berfungsi, saya tutup tiket ya kak."
+        ],
+        "pending_templates": [
+          "Baik kak, saya teruskan ke teknisi ya.",
+          "Sepertinya perlu dicek teknisi, saya bantu proses ya kak."
+        ],
+        "expected_result": [
+          "yes",
+          "no"
+        ],
+        "logic": {
+          "on_answer_yes": {
+            "next": "cek_remote_low"
+          },
+          "on_answer_no": {
+            "next": "cek_remote_low"
+          }
+        }
+      },
+      {
+        "id": "cek_remote_low",
+        "order": 2,
+        "type": "binary",
+        "description": "Mode LOW adalah mode paling dasar.",
+        "ask_templates": [
+          "Silakan tekan tombol Low Mode di remote untuk menghidupkan. Jika lampu indikator kuning menyala, unit sudah normal. Mohon info kembali jika masih berkendala ya kak",
+          "Coba tekan LOW di remote. Bila indikator kuning menyala dan hembusan terasa, berarti perangkat sudah berjalan normal. Kalau masih ada kendala silakan chat lagi ya kak",
+          "Boleh dicoba untuk menekan tombol LOW di remote ya kak, kalau lampu kuning pada unit sudah menyala berarti sudah normal alatnya"
+        ],
+        "confirm_templates": [
+          "Apakah setelah tekan tombol LOW di remote alatnya sudah menyala kak?",
+          "Setelah tekan tombol LOW di remote, apakah alatnya sudah berfungsi?",
+          "Kalau tombol LOW ditekan, apakah sudah muncul respon kak?"
+        ],
+        "resolve_templates": [
+          "Baik kak, kalau sudah nyala kembali saya tutup laporannya ya",
+          "Sip kak, alatnya sudah normal kembali ya",
+          "Kalau sudah berfungsi, laporannya saya close"
+        ],
+        "pending_templates": [
+          "Baik kak, sepertinya alat perlu dicek teknisi.",
+          "Saya bantu teruskan ke teknisi ya kak."
+        ],
+        "expected_result": [
+          "yes",
+          "no"
+        ],
+        "logic": {
+          "on_answer_yes": {
+            "resolve": true
+          },
+          "on_answer_no": {
+            "next": "cek_mcb"
+          }
+        }
+      },
+      {
+        "id": "cek_mcb",
+        "order": 3,
+        "type": "binary",
+        "description": "MCB OFF adalah penyebab terbesar alat mati total.",
+        "ask_templates": [
+          "Kak, bisa dicek posisi MCB-nya apakah sedang di posisi ON?",
+          "Boleh dicek dulu MCB listriknya kak, apakah sudah ON?",
+          "Mohon cek sakelar MCB—apakah dalam posisi ON?"
+        ],
+        "instruct_templates": [
+          "Kalau belum menyala, mohon cek MCB di panel listrik. Bila saklarnya turun, naikkan kembali lalu coba nyalakan unit. Jika lampu kuning pada unit menyala, artinya aman dan sudah normal. Ditunggu kabarnya ya kak, semoga masalahnya bisa segera terselesaikan ya",
+          "Tolong lihat MCB-nya, apakah turun? Jika ya, naikkan kembali dan hidupkan unit. Umumnya langsung menyala",
+          "Boleh coba dicek MCB-nya turun ngga kak? Kalau MCB uda dinaikkan saklarnya, tapi masih ngga nyala unitnya, silakan hubungi kami kembali ya"
+        ],
+        "confirm_templates": [
+          "Setelah MCB ON, apakah alatnya menyala kak?",
+          "Kalau MCB sudah ON, apakah alatnya muncul respon?",
+          "Setelah MCB dinaikkan, apakah alat sudah berfungsi kak?"
+        ],
+        "resolve_templates": [
+          "Baik kak, kalau sudah menyala saya tutup laporannya ya.",
+          "Sip kak, laporannya saya close ya.",
+          "Kalau sudah normal kembali, saya tutup tiket ya kak."
+        ],
+        "pending_templates": [
+          "Wah sepertinya power supply atau receivernya bermasalah kak, kami coba jadwalkan teknisi ke tempat kakak ya.",
+          "Jika MCB sudah diaktifkan namun unit masih tidak hidup, indikasinya ada kerusakan pada modul daya/receiver. Kami bantu jadwalkan dengan teknisi ya kak, apakah bersedia?",
+          "Sepertinya ada masalah dengan power supply ata receiver pada alaatnya kak, kami coba jadwalkan teknisinya ya kak"
+        ],
+        "expected_result": [
+          "yes",
+          "no"
+        ],
+        "logic": {
+          "on_answer_yes": {
+            "confirm": true,
+            "resolve_if_yes": true,
+            "pending_if_no": true
+          },
+          "on_answer_no": {
+            "instruct": true,
+            "confirm": true,
+            "resolve_if_yes": true,
+            "pending_if_no": true
+          }
+        }
+      }
+    ]
+  },
+  "bau": {
+    "intent": "bau",
+    "label": "Bau",
+    "steps": [
+      {
+        "id": "cek_filter_carbon",
+        "order": 1,
+        "type": "binary",
+        "description": "Carbon filter membantu mengurangi bau.",
+        "ask_templates": [
+          "Aroma tidak sedap biasanya dari carbon filter yang sudah kotor dan perlu diganti. Jika punya cadangan, silakan ganti filter karbon. Bila tidak ada cadangan, kami bisa bantu kirim/menjadwalkan teknisi untuk penggantian. Apakah mau kami jadwalkan untuk penggantian filternya kak?",
+          "Bau umumnya karena carbon filter perlu diganti. Apakah ingin kami jadwalkan penggantian atau kirim filter pengganti?",
+          "Untuk kasus bau, solusi paling efektif adalah mengganti carbon filter yang sudah kotor kak. Apakah mau kami jadwalkan untuk penggantian filternya kak?"
+        ],
+        "offer_templates": [
+          "Untuk mengurangi bau, disarankan memakai carbon filter kak.",
+          "Kalau belum, carbon filter bisa bantu mengurangi bau.",
+          "Kita tersedia carbon filter yang cocok untuk unit ini kak."
+        ],
+        "pending_templates": [
+          "Baik kak, saya teruskan untuk proses teknisi ya.",
+          "Saya bantu proses untuk ditindaklanjuti teknisi kak."
+        ],
+        "expected_result": [
+          "yes",
+          "no"
+        ],
+        "logic": {
+          "on_answer_yes": {
+            "pending": true
+          },
+          "on_answer_no": {
+            "offer": true,
+            "pending": true
+          }
+        }
+      }
+    ]
+  },
+  "bunyi": {
+    "intent": "bunyi",
+    "label": "Bunyi",
+    "steps": [
+      {
+        "id": "cek_frekuensi",
+        "order": 1,
+        "type": "frequency",
+        "ask_templates": [
+          "Kak, bunyinya sering atau jarang?",
+          "Apakah bunyinya muncul sesekali atau sering?",
+          "Frekuensi bunyinya bagaimana kak—sering atau jarang?"
+        ],
+        "resolve_templates": [
+          "Bila bunyi hanya sesekali lalu hilang, itu masih dalam batas normal, EAC sedang memecah partikel2 yang ada di udara. kalau bunyinya jadi semakin sering, bisa tolong kabari kami yaa",
+          "Bunyi jarang terjadi biasanya normal. Apabila frekuensinya meningkat, silakan hubungi kami untuk pemeriksaan.",
+          "Bunyi tersebut berarti alat kak berfungsi dengan normal kak, tapi jika bunyinya sering dan terus-menerus berarti ada kotoran yang nyangkut dan perlu dibersihkan."
+        ],
+        "pending_templates": [
+          "Bunyi sering menandakan ada kotoran yang tersangkut di pre-filter/collector cell. Mohon matikan unit, bersihkan pre-filter sesuai buku manual (keringkan sempurna), lalu nyalakan kembali. Jika bunyi tetap muncul, kami sarankan pemeriksaan teknisi. Jika ingin kami bantu bersihkan juga bisa kak, apakah kakak ingin dibantu membersihkan alatnya oleh tim teknisi kami?",
+          "Bunyi berulang dan sering biasanya karena debu menumpuk / menyangkut. apakah kakak ingin dibantu membersihkan alatnya oleh tim teknisi kami?",
+          "Sepertinya unitnya perlu dibersihkan kak, karena ada kotoran yang menyangkut pada unitnya. Apakah mau kami jadwalkan teknisinya?"
+        ],
+        "expected_result": [
+          "sering",
+          "jarang"
+        ],
+        "logic": {
+          "on_answer_sering": {
+            "pending": true
+          },
+          "on_answer_jarang": {
+            "resolve": true
+          }
+        }
+      }
+    ]
+  }
+}

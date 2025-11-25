@@ -1,0 +1,444 @@
+[
+  {
+    "ts": "2025-11-24T06:26:49.073395+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-24T06:41:57.004116+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-24T06:47:23.391652+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-24T06:49:17.359224+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-24T06:58:12.624151+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-24T07:00:51.770372+00:00",
+    "func": "extract_product_via_llm",
+    "user_id": "test-logger-001",
+    "call_type": "generate_json",
+    "system": "Kamu adalah ekstrator produk. Jawab HANYA JSON valid.",
+    "prompt": "\n        Ekstrak informasi produk dari jawaban pelanggan:\n        \"Jl. Sudirman 123, Jakarta Selatan\"\n        \n        Produk yang valid: F57A, F90A\n        \n        Cari pola seperti:\n        - \"F57A\" atau \"f57a\" atau \"F 57 A\"\n        - \"F90A\" atau \"f90a\" atau \"F 90 A\"\n        - \"tipe F57A\" atau \"model F90A\"\n        \n        Jawab HANYA JSON:\n        {\n          \"product\": \"F57A/F90A/none\",\n          \"confidence\": \"high/medium/low\"\n        }\n        ",
+    "response": {
+      "product": "none",
+      "confidence": "low"
+    },
+    "meta": {
+      "message": "Jl. Sudirman 123, Jakarta Selatan",
+      "skipped_due_to_regex": false
+    }
+  },
+  {
+    "ts": "2025-11-24T07:06:25.034312+00:00",
+    "func": "extract_product_via_llm",
+    "user_id": "test-logger-001",
+    "call_type": "generate_json",
+    "system": "Kamu adalah ekstrator produk. Jawab HANYA JSON valid.",
+    "prompt": "\n        Ekstrak informasi produk dari jawaban pelanggan:\n        \"AC saya mati\"\n        \n        Produk yang valid: F57A, F90A\n        \n        Cari pola seperti:\n        - \"F57A\" atau \"f57a\" atau \"F 57 A\"\n        - \"F90A\" atau \"f90a\" atau \"F 90 A\"\n        - \"tipe F57A\" atau \"model F90A\"\n        \n        Jawab HANYA JSON:\n        {\n          \"product\": \"F57A/F90A/none\",\n          \"confidence\": \"high/medium/low\"\n        }\n        ",
+    "response": {
+      "product": "none",
+      "confidence": "low"
+    },
+    "meta": {
+      "message": "AC saya mati",
+      "skipped_due_to_regex": false
+    }
+  },
+  {
+    "ts": "2025-11-24T07:06:32.554612+00:00",
+    "func": "extract_product_via_llm",
+    "user_id": "test-logger-001",
+    "call_type": "generate_json",
+    "system": "Kamu adalah ekstrator produk. Jawab HANYA JSON valid.",
+    "prompt": "\n        Ekstrak informasi produk dari jawaban pelanggan:\n        \"tidak menyala\"\n        \n        Produk yang valid: F57A, F90A\n        \n        Cari pola seperti:\n        - \"F57A\" atau \"f57a\" atau \"F 57 A\"\n        - \"F90A\" atau \"f90a\" atau \"F 90 A\"\n        - \"tipe F57A\" atau \"model F90A\"\n        \n        Jawab HANYA JSON:\n        {\n          \"product\": \"F57A/F90A/none\",\n          \"confidence\": \"high/medium/low\"\n        }\n        ",
+    "response": {
+      "product": "none",
+      "confidence": "high"
+    },
+    "meta": {
+      "message": "tidak menyala",
+      "skipped_due_to_regex": false
+    }
+  },
+  {
+    "ts": "2025-11-24T07:06:40.269988+00:00",
+    "func": "extract_product_via_llm",
+    "user_id": "test-logger-001",
+    "call_type": "generate_json",
+    "system": "Kamu adalah ekstrator produk. Jawab HANYA JSON valid.",
+    "prompt": "\n        Ekstrak informasi produk dari jawaban pelanggan:\n        \"Budi\"\n        \n        Produk yang valid: F57A, F90A\n        \n        Cari pola seperti:\n        - \"F57A\" atau \"f57a\" atau \"F 57 A\"\n        - \"F90A\" atau \"f90a\" atau \"F 90 A\"\n        - \"tipe F57A\" atau \"model F90A\"\n        \n        Jawab HANYA JSON:\n        {\n          \"product\": \"F57A/F90A/none\",\n          \"confidence\": \"high/medium/low\"\n        }\n        ",
+    "response": {
+      "product": "F57A/F90A",
+      "confidence": "high"
+    },
+    "meta": {
+      "message": "Budi",
+      "skipped_due_to_regex": false
+    }
+  },
+  {
+    "ts": "2025-11-24T07:06:51.104303+00:00",
+    "func": "validate_address_via_llm",
+    "user_id": "test-logger-001",
+    "call_type": "generate_json",
+    "system": "Kamu adalah validator alamat. Jawab HANYA JSON valid.",
+    "prompt": "\n        Analisis alamat berikut dan tentukan:\n        1. Apakah alamat ini LENGKAP untuk pengiriman/kunjungan teknisi?\n        2. Apakah alamat ini berada di JABODETABEK?\n        \n        Alamat: \"F57A\"\n        \n        Kriteria alamat lengkap (MINIMAL):\n        - Ada nama jalan/gang/komplek\n        - Ada nomor rumah/blok ATAU patokan jelas (KM, dekat landmark, dll)\n        - Ada nama kota/wilayah Jabodetabek (Jakarta Selatan, Depok, Tangerang, Bekasi, dll)\n        \n        PENTING: \n        - Alamat dianggap LENGKAP jika memiliki 3 komponen di atas\n        - \"KM\" (kilometer) adalah patokan yang VALID\n        - Kelurahan/kecamatan adalah OPSIONAL, tidak wajib\n        - Jika ada nama kota (Jakarta, Depok, Tangerang, Bekasi, Bogor), itu SUDAH CUKUP\n        \n        Area Jabodetabek meliputi:\n        - Jakarta (semua wilayah: Selatan, Utara, Barat, Timur, Pusat)\n        - Bogor (kota dan kabupaten)\n        - Depok\n        - Tangerang (kota dan selatan)\n        - Bekasi (kota dan kabupaten)\n        \n        Contoh alamat LENGKAP:\n        - \"Jl. Sudirman 123, Jakarta Selatan\" ✓\n        - \"Jl. Raya Bogor KM 25, Depok\" ✓\n        - \"Komplek Griya Asri, Bekasi\" ✓\n        \n        Contoh alamat TIDAK LENGKAP:\n        - \"Jl. Sudirman\" ✗ (tidak ada kota)\n        - \"Jakarta Selatan\" ✗ (tidak ada jalan)\n        \n        Jawab HANYA JSON:\n        {\n          \"is_complete\": true/false,\n          \"is_jabodetabek\": true/false,\n          \"missing_info\": [\"list info yang kurang jika tidak lengkap\"],\n          \"confidence\": \"high/medium/low\",\n          \"reason\": \"penjelasan singkat\"\n        }\n        ",
+    "response": {
+      "is_complete": false,
+      "is_jabodetabek": false,
+      "missing_info": [
+        "nama jalan/gang/komplek",
+        "nomor rumah/blok atau patokan jelas",
+        "nama kota/wilayah Jabodetabek"
+      ],
+      "confidence": "low",
+      "reason": "Informasi alamat tidak memenuhi kriteria lengkap dan tidak berada di area Jabodetabek."
+    },
+    "meta": {
+      "address": "F57A",
+      "python_validation_score": 1,
+      "skipped_due_to_python": false
+    }
+  },
+  {
+    "ts": "2025-11-24T07:06:54.306673+00:00",
+    "func": "generate_incomplete_address_message",
+    "user_id": "test-logger-001",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan untuk memberitahu pelanggan bahwa alamat kurang lengkap.\n        \n        Info yang kurang: nama jalan/gang/komplek, nomor rumah/blok atau patokan jelas, nama kota/wilayah Jabodetabek\n        Sapaan: Kak\n        \n        Aturan:\n        - Sopan dan tidak menyalahkan\n        - Jelaskan apa yang kurang\n        - Minta pelanggan melengkapi\n        - Maksimal 2-3 kalimat\n        \n        Contoh: \"Maaf Kak, alamatnya masih kurang lengkap. Bisa ditambahkan nama jalan/gang/komplek, nomor rumah/blok atau patokan jelas, nama kota/wilayah Jabodetabeknya? Supaya teknisi kami bisa sampai dengan tepat.\"\n        ",
+    "response": "Maaf Kak, alamat yang Anda berikan masih kurang lengkap. Bisa ditambahkan nama jalan/gang/komplek, nomor rumah/blok atau patokan jelas, serta nama kota/wilayah Jabodetabeknya? Ini akan membantu teknisi kami untuk sampai di tempat dengan lebih mudah dan tepat waktu. Terima kasih atas perhatiannya.",
+    "meta": {
+      "missing_info": [
+        "nama jalan/gang/komplek",
+        "nomor rumah/blok atau patokan jelas",
+        "nama kota/wilayah Jabodetabek"
+      ]
+    }
+  },
+  {
+    "ts": "2025-11-24T07:07:03.472828+00:00",
+    "func": "generate_completion_message",
+    "user_id": "test-logger-001",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Budi\n        - Produk: F57A\n        - Alamat: Jl. Sudirman 123, Jakarta Selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Kak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Kak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih Kak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Budi",
+      "product": "F57A",
+      "address": "Jl. Sudirman 123, Jakarta Selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-24T08:18:43.398034+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T03:35:28.993377+00:00",
+    "func": "validate_address_via_llm",
+    "user_id": "6282216860317",
+    "call_type": "generate_json",
+    "system": "Kamu adalah validator alamat. Jawab HANYA JSON valid.",
+    "prompt": "\n        Analisis alamat berikut dan tentukan:\n        1. Apakah alamat ini LENGKAP untuk pengiriman/kunjungan teknisi?\n        2. Apakah alamat ini berada di JABODETABEK?\n        \n        Alamat: \"jakarta selata\"\n        \n        Kriteria alamat lengkap (MINIMAL):\n        - Ada nama jalan/gang/komplek\n        - Ada nomor rumah/blok ATAU patokan jelas (KM, dekat landmark, dll)\n        - Ada nama kota/wilayah Jabodetabek (Jakarta Selatan, Depok, Tangerang, Bekasi, dll)\n        \n        PENTING: \n        - Alamat dianggap LENGKAP jika memiliki 3 komponen di atas\n        - \"KM\" (kilometer) adalah patokan yang VALID\n        - Kelurahan/kecamatan adalah OPSIONAL, tidak wajib\n        - Jika ada nama kota (Jakarta, Depok, Tangerang, Bekasi, Bogor), itu SUDAH CUKUP\n        \n        Area Jabodetabek meliputi:\n        - Jakarta (semua wilayah: Selatan, Utara, Barat, Timur, Pusat)\n        - Bogor (kota dan kabupaten)\n        - Depok\n        - Tangerang (kota dan selatan)\n        - Bekasi (kota dan kabupaten)\n        \n        Contoh alamat LENGKAP:\n        - \"Jl. Sudirman 123, Jakarta Selatan\" ✓\n        - \"Jl. Raya Bogor KM 25, Depok\" ✓\n        - \"Komplek Griya Asri, Bekasi\" ✓\n        \n        Contoh alamat TIDAK LENGKAP:\n        - \"Jl. Sudirman\" ✗ (tidak ada kota)\n        - \"Jakarta Selatan\" ✗ (tidak ada jalan)\n        \n        Jawab HANYA JSON:\n        {\n          \"is_complete\": true/false,\n          \"is_jabodetabek\": true/false,\n          \"missing_info\": [\"list info yang kurang jika tidak lengkap\"],\n          \"confidence\": \"high/medium/low\",\n          \"reason\": \"penjelasan singkat\"\n        }\n        ",
+    "response": {
+      "is_complete": false,
+      "is_jabodetabek": true,
+      "missing_info": [
+        "nama jalan/gang/komplek",
+        "nomor rumah/blok atau patokan jelas"
+      ],
+      "confidence": "low",
+      "reason": "kurang nama jalan dan nomor rumah"
+    },
+    "meta": {
+      "address": "jakarta selata",
+      "python_validation_score": 1,
+      "skipped_due_to_python": false
+    }
+  },
+  {
+    "ts": "2025-11-25T03:35:31.595301+00:00",
+    "func": "generate_incomplete_address_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan untuk memberitahu pelanggan bahwa alamat kurang lengkap.\n        \n        Info yang kurang: nama jalan/gang/komplek, nomor rumah/blok atau patokan jelas\n        Sapaan: Pak\n        \n        Aturan:\n        - Sopan dan tidak menyalahkan\n        - Jelaskan apa yang kurang\n        - Minta pelanggan melengkapi\n        - Maksimal 2-3 kalimat\n        \n        Contoh: \"Maaf Pak, alamatnya masih kurang lengkap. Bisa ditambahkan nama jalan/gang/komplek, nomor rumah/blok atau patokan jelasnya? Supaya teknisi kami bisa sampai dengan tepat.\"\n        ",
+    "response": "Maaf Pak, alamat yang Anda berikan masih kurang lengkap. Bisa ditambahkan nama jalan/gang/komplek, nomor rumah/blok, atau patokan jelas lainnya? Hal ini akan membantu teknisi kami untuk sampai di tempat dengan lebih akurat. Terima kasih atas perhatiannya.",
+    "meta": {
+      "missing_info": [
+        "nama jalan/gang/komplek",
+        "nomor rumah/blok atau patokan jelas"
+      ]
+    }
+  },
+  {
+    "ts": "2025-11-25T03:36:26.729192+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T03:39:18.669505+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T03:49:59.377669+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T03:53:37.515859+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T03:54:40.641092+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T03:55:26.776043+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T06:15:24.556902+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T06:24:27.244565+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T07:28:48.978102+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T07:36:33.188845+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Budi\n        - Produk: F57A\n        - Alamat: jalan gatot subroto, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih, Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Budi",
+      "product": "F57A",
+      "address": "jalan gatot subroto, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T08:00:30.872695+00:00",
+    "func": "generate_completion_message",
+    "user_id": "test_memory_002",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Budi\n        - Produk: F57A\n        - Alamat: Jalan Sudirman No 123, Jakarta Pusat\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Budi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih Pak Budi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Budi",
+      "product": "F57A",
+      "address": "Jalan Sudirman No 123, Jakarta Pusat",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T08:18:30.526252+00:00",
+    "func": "generate_completion_message",
+    "user_id": "bugfix_test_008",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Andi\n        - Produk: F57A\n        - Alamat: Jl Thamrin 45 Jakarta\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Pak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Pak Andi. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih Pak Andi. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Andi",
+      "product": "F57A",
+      "address": "Jl Thamrin 45 Jakarta",
+      "is_jabodetabek": true
+    }
+  },
+  {
+    "ts": "2025-11-25T08:32:06.562922+00:00",
+    "func": "generate_completion_message",
+    "user_id": "6282216860317",
+    "call_type": "generate",
+    "system": "Kamu adalah CS Honeywell yang ramah dan profesional.",
+    "prompt": "\n        Generate pesan penutup setelah data lengkap dikumpulkan.\n        \n        Data pelanggan:\n        - Nama: Pak Alex\n        - Produk: F57A\n        - Alamat: alamat saya di jalan nigga, no 45, jakarta selatan\n        - Lokasi: Jabodetabek\n        \n        Sapaan: Kak\n        \n        Aturan:\n        - Ucapkan terima kasih\n        - Konfirmasi data sudah diterima\n        - Informasikan teknisi akan menghubungi\n        - Maksimal 2-3 kalimat\n        - Jangan gunakan tanda tanya\n        \n        Contoh: \"Terima kasih Kak Pak Alex. Data sudah kami terima. Teknisi kami akan segera menghubungi untuk jadwal kunjungan.\"\n        ",
+    "response": "Terima kasih Kak Pak Alex. Data yang Anda berikan telah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan.",
+    "meta": {
+      "name": "Pak Alex",
+      "product": "F57A",
+      "address": "alamat saya di jalan nigga, no 45, jakarta selatan",
+      "is_jabodetabek": true
+    }
+  }
+]

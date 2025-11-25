@@ -1,0 +1,866 @@
+IND-ON-001 — ON LED tidak menyala
+1) Skenario: Customer tidak paham teknis (akhirnya resolved)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang terlihat di unit pembersih udaranya sekarang?
+Customer: Lampu ON-nya nggak nyala. Kayak nggak hidup.
+[NAMA AI AGENT]: Paham. Sebelum lanjut, saya pastikan dulu: tidak ada bau hangus, asap, percikan besar, atau air menetes ke unit ya?
+Customer: Nggak ada.
+[NAMA AI AGENT]: Baik. Saya bicara dengan siapa?
+Customer: Sari.
+[NAMA AI AGENT]: Baik, Bu Sari. Unitnya terpasang di area mana? (kecamatan/kota cukup)
+Customer: Tebet, Jakarta Selatan.
+[NAMA AI AGENT]: Terima kasih. Kita cek dari yang paling mudah dulu ya. Saat ini AC/kipas gedung menyala? Hembusan angin di ventilasi terasa?
+Customer: Iya, anginnya terasa.
+[NAMA AI AGENT]: Oke. Di panel depan ada tombol kecil bertuliskan TEST. Bisa ditekan sebentar—apakah terdengar bunyi “cekrek/snap”?
+Customer: Saya tekan… nggak ada bunyi.
+[NAMA AI AGENT]: Siap. Kita lakukan langkah ringan yang aman. Mohon matikan sakelar unitnya dulu.
+Customer: Sudah.
+[NAMA AI AGENT]: Buka pintu depannya. Di dalam ada dua “kaset” (filter/cell). Tolong keluarkan pelan lalu pasang kembali sampai terasa masuk rapat. Kalau sudah, tutup pintu rapat dan nyalakan lagi. Setelah itu lihat lampu ON.
+Customer: Oke… sudah dipasang rapat. Sekarang lampu ON nyala.
+[NAMA AI AGENT]: Mantap. Berarti dudukan cell/prefilter atau penutupnya tadi belum rapat—interlock-nya belum menutup. Sekarang sudah normal.
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi, untuk catatan layanan ya, Bu?
+Customer: 08xx-xxxx-7799.
+[NAMA AI AGENT]: Terima kasih. Untuk saat ini kita anggap selesai sebagai konsultasi. Kalau nanti gejalanya muncul lagi, kabari saya di sini—kita bantu lanjut.
+Customer: Siap, terima kasih.
+[NAMA AI AGENT]: Berikut ringkasannya saya tulis rapi:
+* Nama: Sari
+* No. HP: 08xx-xxxx-7799
+* Alamat/Domisili: Tebet, Jakarta Selatan
+* Jenis Layanan: Konsultasi (remote)
+* Keluhan: ON LED tidak menyala
+* Deskripsi/Kronologis: AHU/kipas ON; TEST tanpa bunyi; dilakukan reseat cell/prefilter (daya OFF) dan pintu ditutup rapat; interlock menutup; ON LED menyala → resolved.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket / P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Apa gejalanya di unit EAC?
+Customer: ON LED tidak menyala. Unit tidak start.
+[NAMA AI AGENT]: Ada bau hangus, asap, atau arcing yang besar?
+Customer: Tidak ada.
+[NAMA AI AGENT]: Baik. Saya berbicara dengan siapa?
+Customer: Dimas.
+[NAMA AI AGENT]: Baik, Pak Dimas. AHU/kipas saat ini ON?
+Customer: ON.
+[NAMA AI AGENT]: Saat TEST ditekan 10–15 detik, ada “snap”?
+Customer: Tidak ada snap.
+[NAMA AI AGENT]: Sudah coba reseat cell/prefilter dalam kondisi OFF dan memastikan keduanya duduk rapat?
+Customer: Sudah. Bahkan saya cek continuity pegasnya—oke.
+[NAMA AI AGENT]: Penutup sudah rapat dan interlock menutup?
+Customer: Iya, interlock “click”, tetap tidak start.
+[NAMA AI AGENT]: Baik. Dengan hasil ini, kemungkinan ada isu di interlock/indikator/wiring/power board. Ini perlu dicek teknisi di lokasi.
+[NAMA AI AGENT]: Boleh nomor HP aktif untuk update kunjungan?
+Customer: 08xx-xxxx-4466.
+[NAMA AI AGENT]: Terima kasih. Alamat lokasi unit di mana, Pak?
+Customer: Ruko Boulevard…, Kelapa Gading, Jakarta Utara.
+[NAMA AI AGENT]: Baik. Untuk penanganan, Bapak prefer servis onsite ya?
+Customer: Ya, onsite.
+[NAMA AI AGENT]: Jika sempat, mohon foto label model/serial di bagian dalam pintu—agar teknisi menyiapkan part yang sesuai. Nanti bisa dikirim di chat ini.
+Customer: Oke, nanti saya kirim.
+[NAMA AI AGENT]: Terima kasih, Pak Dimas. Berikut ringkasannya:
+* Nama: Dimas
+* No. HP: 08xx-xxxx-4466
+* Alamat: Ruko Boulevard…, Kelapa Gading, Jakarta Utara
+* Jenis Layanan: Servis Onsite
+* Keluhan: ON LED tidak menyala
+* Deskripsi/Kronologis: AHU ON; TEST tanpa “snap”; reseat cell/prefilter (daya OFF) sudah dilakukan, penutup rapat & interlock menutup; ON LED tetap off. Indikasi ke interlock/indikator/wiring/PSU → P2 (perlu teknisi).
+Teknisi kami akan menghubungi untuk konfirmasi jadwal. Jika ada perubahan gejala atau foto label sudah siap, kirimkan di sini—kami lanjutkan.
+
+
+IND-CHECK-001 — CHECK menyala saat start-up
+1) Skenario: Customer tidak paham teknis (akhirnya resolved – normal behavior)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang terlihat di unitnya sekarang?
+Customer: Begitu dinyalakan, lampu CHECK langsung nyala.
+[NAMA AI AGENT]: Baik. Ada bau hangus atau bunyi percikan kuat?
+Customer: Nggak ada.
+[NAMA AI AGENT]: Saya bicara dengan siapa?
+Customer: Tika.
+[NAMA AI AGENT]: Baik, Bu Tika. Lampu CHECK-nya nyala berapa lama? Hanya sebentar saat awal start, atau tetap menyala terus?
+Customer: Hanya beberapa detik, terus mati sendiri.
+[NAMA AI AGENT]: Oke. Itu normal saat start-up—indikator sedang self-check. Selama setelah itu CHECK padam dan unit berjalan normal, tidak ada masalah.
+Customer: Oh gitu. Saya kira rusak.
+[NAMA AI AGENT]: Wajar khawatir. Untuk memastikan saja: tombol TEST kalau ditekan 10–20 detik, CHECKmuncul sebentar lalu padam lagi?
+Customer: Iya, muncul sebentar, terus mati.
+[NAMA AI AGENT]: Berarti fungsinya normal. Jika nanti CHECK bertahan lama, kita cek hal ini: terakhir cuci cellkapan, pastikan kering total, dan arah arrow di cell tidak terbalik.
+Customer: Siap.
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi kalau butuh follow-up?
+Customer: 08xx-xxxx-2211.
+[NAMA AI AGENT]: Terima kasih, Bu Tika. Saya simpulkan dulu, ya.
+Ringkasan
+* Nama: Tika
+* No. HP: 08xx-xxxx-2211
+* Keluhan: CHECK menyala saat start-up
+* Temuan: CHECK hanya beberapa detik lalu padam; uji TEST menunjukkan CHECK muncul sesaat lalu hilang → normal behavior
+* Status: Resolved (informasi & edukasi)
+* Catatan: Jika CHECK bertahan lama, lakukan cek: cuci cell, keringkan total, pastikan arrow benar. Bila tetap persisten → buat tiket P2.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket – P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Gejala yang terlihat di unitnya bagaimana?
+Customer: Saat start-up, CHECK menyala dan tidak padam.
+[NAMA AI AGENT]: Ada bau hangus atau arcing keras?
+Customer: Tidak ada.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Bayu.
+[NAMA AI AGENT]: Baik, Pak Bayu. Terakhir cuci cell kapan?
+Customer: Dua minggu lalu. Dibilas bersih.
+[NAMA AI AGENT]: Saat dipasang, cell benar-benar kering total dan duduk rapat?
+Customer: Kering total, duduk rapat.
+[NAMA AI AGENT]: Mohon tekan TEST ±30 detik. CHECK tetap menyala atau sempat hilang?
+Customer: Tetap menyala.
+[NAMA AI AGENT]: Orientasi cell sudah sesuai arrow ke arah aliran balik (return), tidak terbalik?
+Customer: Sudah sesuai.
+[NAMA AI AGENT]: Baik. Dengan CHECK persisten setelah cuci-kering-orientasi benar, perlu kunjungan teknisi (kemungkinan di jalur kolektor/interlock/board/sensor).
+[NAMA AI AGENT]: Boleh nomor HP aktif untuk update jadwal?
+Customer: 08xx-xxxx-7789.
+[NAMA AI AGENT]: Terima kasih. Alamat lokasinya di mana, Pak?
+Customer: Komplek Industri Sentra…, Tangerang.
+[NAMA AI AGENT]: Baik. Untuk penanganan, prefer servis onsite, ya?
+Customer: Ya, onsite.
+[NAMA AI AGENT]: Jika sempat, mohon foto label model/serial di bagian dalam pintu—supaya teknisi menyiapkan part yang tepat.
+Customer: Oke, saya kirim nanti.
+[NAMA AI AGENT]: Terima kasih, Pak Bayu. Saya rangkum:
+Ringkasan
+* Nama: Bayu
+* No. HP: 08xx-xxxx-7789
+* Alamat: Komplek Industri Sentra…, Tangerang
+* Jenis Layanan: Servis Onsite
+* Keluhan: CHECK menyala saat start-up dan tetap persisten
+* Troubleshooting jarak jauh: Cell dicuci 2 minggu lalu, kering total, duduk rapat; TEST 30 detik tetap CHECK; arrow orientasi benar; tanpa arcing/bau hangus
+* Keputusan: Create Ticket – P2 (perlu teknisi onsite)
+* Catatan teknisi: Cek jalur kolektor/interlock/board/sensor CHECK; siapkan part umum & alat ukur
+Tim akan menghubungi untuk konfirmasi jadwal kunjungan. Jika ada perubahan gejala atau foto label sudah siap, silakan kirim di sini, kami lanjutkan.
+
+
+IND-TEST-001 — Test ditekan, tidak ada “snap”
+1) Skenario: Customer tidak paham teknis (akhirnya resolved)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang terlihat di unit pembersih udaranya?
+Customer: Saya tekan tombol TEST, tapi nggak ada bunyi “cekrek”.
+[NAMA AI AGENT]: Baik. Sebelum lanjut, saya pastikan dulu: tidak ada bau hangus, asap, percikan besar, atau air menetes ke unit, ya?
+Customer: Nggak ada.
+[NAMA AI AGENT]: Saya bicara dengan siapa?
+Customer: Rina.
+[NAMA AI AGENT]: Baik, Bu Rina. Sekarang AC/kipas gedung menyala? Hembusan angin di ventilasi terasa?
+Customer: Terasa.
+[NAMA AI AGENT]: Oke. Kita mulai dari langkah yang aman. Tolong matikan sakelar unit dulu.
+Customer: Sudah.
+[NAMA AI AGENT]: Buka pintu depan. Di dalam ada dua “kaset” (prefilter & cell). Mohon keluarkan pelan-pelan lalu pasang kembali sampai terasa benar-benar rapat. Tidak perlu alat, cukup tangan.
+Customer: Baik… sudah saya pasang rapat.
+[NAMA AI AGENT]: Tutup pintunya rapat sampai benar-benar menutup. Lalu nyalakan lagi. Setelah menyala, silakan tekan TEST 10–20 detik. Ada bunyi “cekrek” sekarang?
+Customer: Ada. Tadi baru bunyi.
+[NAMA AI AGENT]: Bagus. Berarti tadi dudukannya kurang rapat atau interlock belum menutup. Sekarang sudah normal.
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi untuk catatan layanan?
+Customer: 08xx-xxxx-5577.
+[NAMA AI AGENT]: Terima kasih, Bu. Jika nanti gejala muncul lagi, kabari saya di sini—kita bantu lanjut. Berikut ringkasannya:
+* Nama: Rina
+* No. HP: 08xx-xxxx-5577
+* Keluhan: Tombol TEST ditekan tidak ada “snap”
+* Temuan: AHU/kipas ON; reseat prefilter & cell (daya OFF); pintu ditutup rapat; interlock menutup; uji ulang TEST → terdengar “snap” → resolved
+* Catatan: Jika kembali hilang “snap”, cek ulang dudukan cell/prefilter & penutup.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket / P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Apa gejalanya di unit EAC?
+Customer: Saat TEST ditekan, tidak ada “snap”.
+[NAMA AI AGENT]: Ada bau hangus atau arcing yang besar?
+Customer: Tidak ada.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Fajar.
+[NAMA AI AGENT]: Baik, Pak Fajar. AHU/kipas ON saat pengujian?
+Customer: ON.
+[NAMA AI AGENT]: Sudah coba reseat prefilter & cell dalam kondisi OFF dan memastikan pintu menutup interlock?
+Customer: Sudah. Reseat berulang, interlock “click”, tetap tidak ada snap.
+[NAMA AI AGENT]: Saat ditekan, tombol TEST terasa macet atau travel-nya normal?
+Customer: Travel normal, tidak macet.
+[NAMA AI AGENT]: Baik. Dengan kondisi AHU ON, dudukan cell/prefilter rapat, interlock menutup, tombol TESTtidak macet, tapi tidak ada “snap”, perlu pengecekan teknisi—kemungkinan pada jalur kolektor, kabel tombol TEST, contact board, atau power/indikator.
+[NAMA AI AGENT]: Boleh nomor HP aktif untuk update jadwal?
+Customer: 08xx-xxxx-6622.
+[NAMA AI AGENT]: Terima kasih. Alamat lokasi unit di mana, Pak?
+Customer: Pergudangan Delta… Bekasi.
+[NAMA AI AGENT]: Untuk penanganan, Bapak prefer servis onsite, ya?
+Customer: Ya, onsite.
+[NAMA AI AGENT]: Jika sempat, mohon foto label model/serial di bagian dalam pintu—agar teknisi menyiapkan part yang sesuai. Nanti bisa dikirim di chat ini.
+Customer: Siap, saya kirim.
+[NAMA AI AGENT]: Terima kasih, Pak Fajar. Berikut ringkasannya:
+* Nama: Fajar
+* No. HP: 08xx-xxxx-6622
+* Alamat: Pergudangan Delta…, Bekasi
+* Jenis Layanan: Servis Onsite
+* Keluhan: TEST ditekan, tidak ada “snap”
+* Troubleshooting jarak jauh: AHU ON; reseat prefilter & cell (daya OFF) sudah dilakukan; pintu rapat & interlock menutup; tombol TEST tidak macet; tidak ada snap
+* Keputusan: Create Ticket – P2 (perlu teknisi)
+* Catatan teknisi: Periksa kabel/aktuator TEST, contact board, jalur tegangan kolektor, indikator/PSU. Siapkan alat ukur & part umum.
+Tim akan menghubungi untuk konfirmasi jadwal. Jika ada perubahan gejala atau foto label sudah siap, silakan kirim di sini—kami lanjutkan.
+
+
+ION-ARC-001 — Arcing berulang (bunyi “kretek”)
+1) Skenario: Customer tidak paham teknis (akhirnya resolved)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang terdengar/terlihat di unitnya sekarang?
+Customer: Ada bunyi “kretek-kretek”, seperti percikan kecil.
+[NAMA AI AGENT]: Baik. Saya pastikan dulu: tidak ada asap, bau hangus, atau percikan besar yang menyilaukan, ya?
+Customer: Tidak ada. Hanya bunyi saja.
+[NAMA AI AGENT]: Baik. Saya bicara dengan siapa?
+Customer: Della.
+[NAMA AI AGENT]: Terima kasih, Bu Della. Unitnya terpasang di area mana? (kecamatan/kota cukup)
+Customer: Cikarang, Bekasi.
+[NAMA AI AGENT]: Baik. Saat bunyi itu muncul, AC/kipas gedung dalam kondisi menyala?
+Customer: Iya, menyala.
+[NAMA AI AGENT]: Mengerti. Kita lakukan langkah paling aman dan sederhana dulu, saya pandu pelan-pelan.
+[NAMA AI AGENT]: Mohon matikan sakelar unit dulu, ya.
+Customer: Sudah.
+[NAMA AI AGENT]: Silakan buka pintu depan unit. Di dalam ada dua “kaset”: prefilter (kaset tipis) dan cell (kaset utama). Lihat cepat di bagian depan cell—apakah ada serangga/debu besar yang menempel di kawat atau plat?
+Customer: Ada serangga kecil nempel di situ.
+[NAMA AI AGENT]: Baik. Tolong keluarkan prefilter dan cell pelan-pelan. Goyangkan ringan prefilternya di tempat yang aman, lalu angkat serangganya dari cell (gunakan tisu/kain kering; jangan sentuh kawat terlalu keras). Jika ada yang sulit, jangan dipaksa.
+Customer: Sudah dibersihkan.
+[NAMA AI AGENT]: Bagus. Pastikan cell dalam keadaan kering (tidak lembap). Kalau ragu, lap ringan bagian yang basah lalu diamkan sebentar.
+Customer: Kering.
+[NAMA AI AGENT]: Sekarang pasang kembali prefilter dan cell sampai terasa duduk rapat. Tutup pintu rapat. Nyalakan lagi unitnya. Setelah menyala, tekan TEST sebentar—apakah bunyi “kretek” masih ada?
+Customer: Sudah tidak ada bunyi lagi.
+[NAMA AI AGENT]: Baik, berarti sumbernya dari debris/serangga yang memicu arcing. Nanti kalau bunyi muncul lagi, kabari saya—kita bisa jadwalkan pembersihan menyeluruh.
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi untuk catatan dan follow-up?
+Customer: 08xx-xxxx-7341.
+[NAMA AI AGENT]: Terima kasih, Bu. Saya tulis ringkasannya:
+* Nama: Della
+* No. HP: 08xx-xxxx-7341
+* Alamat/Domisili: Cikarang, Bekasi
+* Jenis Layanan: Konsultasi (remote)
+* Keluhan: Arcing berulang (bunyi “kretek”)
+* Deskripsi/Kronologis: AHU ON; terdengar arcing kecil berulang; unit dimatikan; prefilter & cell dilepas; ditemukan serangga pada cell; dibersihkan; dipastikan kering; dipasang kembali; uji TEST normal; bunyi hilang → resolved
+* Catatan: Jika arcing kembali cepat/kuat, segera matikan daya dan hubungi kami untuk penjadwalan servis.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket / P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Gejalanya bagaimana di unit EAC?
+Customer: Ada arcing berulang, bunyinya “kretek” terus, terutama saat beban tinggi.
+[NAMA AI AGENT]: Ada asap/bau hangus atau percikan yang besar?
+Customer: Tidak besar, tapi cukup sering.
+[NAMA AI AGENT]: Baik. Saya berbicara dengan siapa?
+Customer: Rendy.
+[NAMA AI AGENT]: Terima kasih, Pak Rendy. Terakhir cuci cell kapan, dan dipasang kembali kering total?
+Customer: Dua minggu lalu. Kering total.
+[NAMA AI AGENT]: Sudah cek cepat debris/serangga di area ionizer wire/collector?
+Customer: Sudah ditiup dan dibersihkan ringan. Masih “kretek”.
+[NAMA AI AGENT]: Orientasi arrow pada cell menuju arah aliran (return), tidak terbalik?
+Customer: Benar, orientasi sudah sesuai.
+[NAMA AI AGENT]: Mohon konfirmasi: plate collector tidak menempel satu sama lain, dan insulator bersih (tidak ada jejak lembap)?
+Customer: Secara visual tidak menempel, insulator bersih.
+[NAMA AI AGENT]: Baik. Dengan arcing yang persisten meski cell kering, bersih, orientasi benar, kemungkinan perlu pemeriksaan lebih lanjut di jarak kawat ionizer, pegas kontak, insulator hairline crack, atau tegangan kolektor. Ini sebaiknya dicek teknisi di lokasi.
+[NAMA AI AGENT]: Boleh nomor HP aktif untuk update kunjungan?
+Customer: 08xx-xxxx-5590.
+[NAMA AI AGENT]: Terima kasih. Alamat lokasi unit di mana, Pak?
+Customer: Pabrik Delta… Karawang.
+[NAMA AI AGENT]: Untuk penanganan, Bapak prefer servis onsite, ya?
+Customer: Iya, onsite.
+[NAMA AI AGENT]: Jika sempat, mohon foto label model/serial pada kabinet—supaya teknisi menyiapkan part yang sesuai.
+Customer: Oke, saya kirim menyusul.
+[NAMA AI AGENT]: Terima kasih, Pak Rendy. Saya rangkum ringkasannya:
+* Nama: Rendy
+* No. HP: 08xx-xxxx-5590
+* Alamat: Pabrik Delta…, Karawang
+* Jenis Layanan: Servis Onsite
+* Keluhan: Arcing berulang (bunyi “kretek”)
+* Troubleshooting jarak jauh: Cell dicuci 2 minggu lalu, kering total; debris/serangga dibersihkan; arrow orientasi benar; collector plate tidak menempel; insulator bersih; arcing tetap persisten
+* Keputusan: Create Ticket – P2 (perlu teknisi onsite)
+* Catatan teknisi: Cek ionizer wire tension/spacing, spring contacts, insulator micro-crack, dan collector HV; siapkan alat ukur & part pengganti dasar.
+Tim akan menghubungi untuk konfirmasi jadwal. Jika bunyi berubah menjadi percikan besar atau muncul bau hangus, mohon matikan daya dan kabari kami—tiket akan diprioritaskan.
+
+
+IND-WASH-001 — WASH menyala minta pencucian
+1) Skenario: Customer tidak paham teknis (akhirnya resolved – setelah dicuci)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Apa yang terlihat di unitnya sekarang?
+Customer: Lampu WASH nyala.
+[NAMA AI AGENT]: Baik. Ada bau hangus atau percikan besar?
+Customer: Nggak ada.
+[NAMA AI AGENT]: Saya bicara dengan siapa?
+Customer: Linda.
+[NAMA AI AGENT]: Baik, Bu Linda. WASH itu tanda minta dibersihkan. Ibu ada waktu 10–15 menit untuk saya pandu cuci yang aman?
+Customer: Bisa.
+[NAMA AI AGENT]: Terima kasih. Mohon matikan sakelar unitnya dulu.
+Customer: Sudah.
+[NAMA AI AGENT]: Buka pintu depan. Di dalam ada prefilter (yang tipis) dan cell (kaset utama). Tolong keluarkan keduanya pelan-pelan, ya.
+Customer: Sudah keluar.
+[NAMA AI AGENT]: Kita mulai dari cell. Siapkan air + sabun ringan (detergen cair lembut). Jangan pakai coil cleaner. Cuci kedua sisi cell dengan lembut.
+Customer: Oke, lagi dicuci.
+[NAMA AI AGENT]: Setelah itu bilas menyeluruh sampai busanya hilang. Pastikan tidak licin lagi.
+Customer: Sudah dibilas bersih.
+[NAMA AI AGENT]: Penting: keringkan total. Bisa ditiriskan lalu diangin-anginkan (pakai kipas) sampai tidak ada air menetes atau lembap, ya.
+Customer: Saya keringkan dulu… Oke, sudah kering.
+[NAMA AI AGENT]: Bagus. Tolong lap ringan kawat ionizer dan contact board (yang tembaga) supaya benar-benar bersih.
+Customer: Sudah.
+[NAMA AI AGENT]: Sekarang pasang kembali prefilter dan cell sampai duduk rapat, lalu tutup pintu rapat. Nyalakan unit. Apakah WASH masih menyala?
+Customer: Sudah padam.
+[NAMA AI AGENT]: Baik, berarti selesai. Nanti kalau muncul lagi dalam waktu dekat, beri kabar ya—kita evaluasi lebih lanjut.
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi?
+Customer: 08xx-xxxx-9102.
+[NAMA AI AGENT]: Terima kasih, Bu. Ibu domisili di mana?
+Customer: Bintaro, Tangsel.
+[NAMA AI AGENT]: Baik, saya rangkum dulu secara rapi:
+Ringkasan
+* Nama: Linda
+* No. HP: 08xx-xxxx-9102
+* Alamat/Domisili: Bintaro, Tangerang Selatan
+* Jenis Layanan: Konsultasi (remote)
+* Keluhan: WASH LED menyala
+* Tindakan: Cuci cell dengan sabun ringan → bilas menyeluruh → keringkan total → lap ionizer wire & contact board → pasang rapat → WASH padam
+* Status: Resolved
+* Catatan: Jika WASH kembali menyala dalam waktu dekat, kemungkinan sensor/fault lain → lanjut tiket P2.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket – P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Ada yang bisa saya bantu di unit EAC-nya?
+Customer: WASH menyala. Saya sudah cuci, bilas, kering total, pasang rapat. Masih nyala lagi.
+[NAMA AI AGENT]: Baik. Ada bau hangus atau arcing keras?
+Customer: Tidak ada.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Yoga.
+[NAMA AI AGENT]: Terima kasih, Pak Yoga. Konfirmasi singkat: sabun mild, tanpa coil cleaner, bilas tuntas, kering total, lap ionizer & contact board, lalu pasang rapat—semua sudah dilakukan?
+Customer: Sudah. Bahkan saya dianginkan beberapa jam.
+[NAMA AI AGENT]: Baik. Setelah dinyalakan, WASH muncul segera atau setelah beberapa menit/jam?
+Customer: Muncul lagi dalam 10–15 menit.
+[NAMA AI AGENT]: Mengerti. Dengan WASH yang cepat kembali setelah prosedur cuci lengkap, ini indikasi perlu cek sensor/board/kontak lebih lanjut. Saya sarankan kunjungan teknisi.
+[NAMA AI AGENT]: Boleh nomor HP aktif untuk update jadwal?
+Customer: 08xx-xxxx-3345.
+[NAMA AI AGENT]: Terima kasih. Alamat lokasi unit di mana, Pak?
+Customer: Kawasan Bisnis Grand…, Surabaya.
+[NAMA AI AGENT]: Baik. Bapak prefer servis onsite, ya?
+Customer: Ya, onsite.
+[NAMA AI AGENT]: Kalau sempat, mohon foto label model/serial di bagian dalam pintu—supaya teknisi siapkan part yang sesuai.
+Customer: Oke, nanti saya kirim.
+[NAMA AI AGENT]: Terima kasih, Pak Yoga. Berikut ringkasannya:
+Ringkasan
+* Nama: Yoga
+* No. HP: 08xx-xxxx-3345
+* Alamat: Kawasan Bisnis Grand…, Surabaya
+* Jenis Layanan: Servis Onsite
+* Keluhan: WASH LED tetap muncul setelah dicuci
+* Troubleshooting jarak jauh: Cuci sabun ringan, bilas menyeluruh, kering total; ionizer & contact boarddilap; cell/prefilter terpasang rapat; WASH kembali ≤15 menit
+* Keputusan: Create Ticket – P2 (perlu teknisi)
+* Catatan teknisi: Cek rangkaian/ sensor WASH, contact board, koneksi/grounding; siapkan alat ukur & part pengganti umum.
+Tim kami akan menghubungi untuk konfirmasi jadwal. Jika WASH tiba-tiba disertai arcing atau bau hangus, mohon matikan daya dan kabari kami—tiket akan diprioritaskan.
+
+
+IND-CHECK-002 — Setelah dicuci, CHECK tetap menyala
+1) Skenario: Customer tidak paham teknis (akhirnya resolved – kering belum sempurna)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang terlihat di unitnya sekarang?
+Customer: Tadi cell sudah dicuci, tapi lampu CHECK masih nyala.
+[NAMA AI AGENT]: Baik, saya bantu cek pelan-pelan ya. Ada bau hangus atau percikan besar?
+Customer: Nggak ada.
+[NAMA AI AGENT]: Saya bicara dengan siapa?
+Customer: Mira.
+[NAMA AI AGENT]: Baik, Bu Mira. Sejak dicuci, CHECK-nya tetap nyala terus atau kadang padam?
+Customer: Tetap nyala.
+[NAMA AI AGENT]: Saat selesai cuci, cell-nya sudah kering betul sebelum dipasang? Tidak ada lembap/air menetes?
+Customer: Sudah dikeringkan, tapi mungkin masih agak lembap.
+[NAMA AI AGENT]: Oke, kita pastikan kering sempurna dulu ya. Mohon matikan sakelar unit.
+Customer: Sudah.
+[NAMA AI AGENT]: Lepas cell pelan-pelan. Lap tipis bagian yang masih basah, lalu angin-anginkan di depan kipas ±10–15 menit sampai benar-benar kering (tidak dingin/lembap saat disentuh).
+Customer: Baik… saya keringkan dulu… Oke, sudah terasa kering.
+[NAMA AI AGENT]: Bagus. Sekalian cek panah (arrow) di frame cell—panahnya mengikuti arah aliran udara ke dalam duct, ya.
+Customer: Iya, tadi sempat kebalik. Sekarang sudah saya betulkan.
+[NAMA AI AGENT]: Mantap. Tolong pasang cell sampai duduk rapat, tutup pintu rapat, lalu nyalakan. Setelah menyala, tekan TEST ±15 detik. CHECK masih nyala?
+Customer: Sekarang padam. Kalau ditekan TEST, nyala sebentar lalu mati lagi.
+[NAMA AI AGENT]: Berarti normal. Tadi pemicunya campuran lembap + orientasi terbalik.
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi untuk catatan?
+Customer: 08xx-xxxx-7812.
+[NAMA AI AGENT]: Terima kasih, Bu. Ibu domisili di mana?
+Customer: Pasar Minggu, Jakarta Selatan.
+[NAMA AI AGENT]: Siap, saya tulis ringkasannya:
+* Nama: Mira
+* No. HP: 08xx-xxxx-7812
+* Alamat/Domisili: Pasar Minggu, Jakarta Selatan
+* Jenis Layanan: Konsultasi (remote)
+* Keluhan: Setelah dicuci, CHECK tetap menyala
+* Tindakan: Pastikan kering total, betulkan arrow orientasi, pasang rapat, uji TEST → CHECK padam → resolved
+* Catatan: Jika CHECK muncul lagi cepat, kabari kami—akan dievaluasi lebih lanjut.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket – P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Gejalanya bagaimana di unit EAC?
+Customer: Cell sudah dicuci, dikeringkan 24 jam, dipasang rapat. CHECK tetap menyala.
+[NAMA AI AGENT]: Ada bau hangus atau arcing keras?
+Customer: Tidak ada.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Hendra.
+[NAMA AI AGENT]: Baik, Pak Hendra. Saat TEST ditekan 30 detik, CHECK tetap persist atau sempat hilang?
+Customer: Tetap persist.
+[NAMA AI AGENT]: Orientasi arrow di cell sudah benar ke arah aliran?
+Customer: Sudah benar.
+[NAMA AI AGENT]: Lanjut satu hal: insulator & contact board bersih/kering, tidak ada jejak lembap?
+Customer: Bersih dan kering.
+[NAMA AI AGENT]: Baik. Dengan CHECK persisten meskipun kering total, TEST 30 detik tetap CHECK, orientasi benar, kemungkinan ada isu pada jalur kolektor/interlock/board. Ini perlu kunjungan teknisi.
+[NAMA AI AGENT]: Boleh nomor HP aktif untuk update jadwal?
+Customer: 08xx-xxxx-5520.
+[NAMA AI AGENT]: Terima kasih. Alamat lokasi unit di mana, Pak?
+Customer: Pergudangan KBN…, Jakarta Utara.
+[NAMA AI AGENT]: Untuk penanganan, Bapak prefer servis onsite, ya?
+Customer: Ya, onsite.
+[NAMA AI AGENT]: Jika sempat, mohon foto label model/serial pada kabinet—agar teknisi menyiapkan part yang sesuai.
+Customer: Oke, saya kirim menyusul.
+[NAMA AI AGENT]: Terima kasih, Pak Hendra. Berikut ringkasannya:
+* Nama: Hendra
+* No. HP: 08xx-xxxx-5520
+* Alamat: Pergudangan KBN…, Jakarta Utara
+* Jenis Layanan: Servis Onsite
+* Keluhan: Setelah dicuci, CHECK tetap menyala
+* Troubleshooting jarak jauh: Cell kering 24 jam, duduk rapat; TEST 30 detik tetap CHECK; arrow benar; insulator & contact board bersih/kering; tanpa arcing/bau hangus
+* Keputusan: Create Ticket – P2 (perlu teknisi onsite)
+* Catatan teknisi: Cek tegangan kolektor, interlock, contact board, sensor/board indikator; siapkan alat ukur & part umum.
+Tim kami akan menghubungi untuk konfirmasi jadwal. Jika ada perubahan gejala, kabari di sini—kami lanjutkan.
+CEL-ORIENT-001 — Cell terpasang terbalik (airflow)
+1) Skenario: Customer tidak paham teknis (akhirnya resolved – dibetulkan orientasi)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang terlihat/terdengar dari unit EAC-nya sekarang?
+Customer: Udah nyala, tapi kok kayaknya nggak bekerja bagus. Tadi juga sempat ada lampu.
+[NAMA AI AGENT]: Baik, saya bantu cek pelan-pelan ya. Sebelum lanjut, ada bau hangus, asap, atau percikan yang besar?
+Customer: Nggak ada.
+[NAMA AI AGENT]: Saya bicara dengan siapa?
+Customer: Dina.
+[NAMA AI AGENT]: Baik, Bu Dina. Saat ini AC/kipas gedung menyala? Hembusan udara di ventilasi terasa?
+Customer: Iya, terasa.
+[NAMA AI AGENT]: Oke. Saya ingin pastikan arah pemasangan cell. Di pinggir “kaset” cell ada panah (arrow)kecil. Ibu sempat lihat?
+Customer: Belum.
+[NAMA AI AGENT]: Saya pandu ya. Mohon matikan sakelar unit dulu.
+Customer: Sudah.
+[NAMA AI AGENT]: Buka pintu depannya. Keluarkan cell pelan-pelan. Coba cari stiker panah di frame cell. Arah panahnya harus searah aliran udara masuk ke duct (bukan melawan). Panahnya mengarah ke mana?
+Customer: Panahnya ternyata ke arah luar. Kayaknya kebalik.
+[NAMA AI AGENT]: Tidak apa-apa. Balikkan cell-nya supaya panah mengarah searah aliran. Lalu pasang kembalisampai duduk rapat. Tutup pintu rapat dan nyalakan. Setelah itu tekan TEST 10–15 detik—bagaimana hasilnya?
+Customer: Oke, sudah. Sekarang bunyi “cekrek” ada. Lampu indikatornya juga normal.
+[NAMA AI AGENT]: Sip, berarti penyebabnya cell terpasang terbalik. Sekarang sudah benar.
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi, untuk catatan layanan ya?
+Customer: 08xx-xxxx-4481.
+[NAMA AI AGENT]: Terima kasih. Ibu domisilinya di mana?
+Customer: Palmerah, Jakarta Barat.
+[NAMA AI AGENT]: Baik, saya tulis ringkasannya:
+* Nama: Dina
+* No. HP: 08xx-xxxx-4481
+* Alamat/Domisili: Palmerah, Jakarta Barat
+* Jenis Layanan: Konsultasi (remote)
+* Keluhan: Performa tidak optimal; indikasi salah orientasi
+* Tindakan: Power OFF → keluarkan cell → cek arrow → balikkan sesuai arah aliran → pasang rapat → TEST10–15 dtk → bunyi “snap” normal; indikator normal → resolved
+* Catatan: Jika gejala muncul lagi, kabari kami—nanti dievaluasi spring contact/guide.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket – P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Gejala yang Bapak lihat di EAC bagaimana?
+Customer: Kinerja turun, sebelumnya cell memang sempat terpasang terbalik. Sudah saya balikkan sesuai arrow, tapi masih ada indikator CHECK sesekali.
+[NAMA AI AGENT]: Ada bau hangus atau arcing besar?
+Customer: Tidak.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Reza.
+[NAMA AI AGENT]: Baik, Pak Reza. Setelah dibetulkan orientasinya, cell sudah dipastikan duduk rapat di spring contacts?
+Customer: Sudah. Saya pastikan sampai “klik”.
+[NAMA AI AGENT]: Bagian contact board dan insulator bersih dan kering, ya?
+Customer: Bersih dan kering.
+[NAMA AI AGENT]: Saat menekan TEST 30 detik, ada “snap” stabil? CHECK sempat muncul?
+Customer: Ada “snap”, tapi CHECK kadang muncul sebentar, apalagi saat beban tinggi.
+[NAMA AI AGENT]: Baik. Karena orientasi sudah benar namun CHECK masih intermiten, kemungkinan ada isu di guide/bracket cell, kontak pegas, atau jarak plate/ionizer yang berubah saat vibrasi. Ini sebaiknya dicek teknisi onsite.
+[NAMA AI AGENT]: Boleh nomor HP aktif untuk update jadwal?
+Customer: 08xx-xxxx-9174.
+[NAMA AI AGENT]: Terima kasih. Alamat lokasi unit di mana, Pak?
+Customer: Gedung Sentra…, Bandung.
+[NAMA AI AGENT]: Untuk penanganan, Bapak prefer servis onsite, ya?
+Customer: Ya, onsite.
+[NAMA AI AGENT]: Jika sempat, mohon foto label model/serial di bagian dalam pintu—supaya teknisi menyiapkan part yang sesuai.
+Customer: Siap, nanti saya kirim.
+[NAMA AI AGENT]: Terima kasih, Pak Reza. Ini ringkasannya:
+* Nama: Reza
+* No. HP: 08xx-xxxx-9174
+* Alamat: Gedung Sentra…, Bandung
+* Jenis Layanan: Servis Onsite
+* Keluhan: Cell sempat terpasang terbalik; setelah dibetulkan masih ada CHECK intermiten
+* Troubleshooting jarak jauh: Orientasi arrow sudah benar; spring contacts terasa “klik”; board & insulatorbersih/kering; TEST 30 dtk ada “snap”; CHECK kadang muncul di beban tinggi
+* Keputusan: Create Ticket – P2 (perlu teknisi onsite)
+* Catatan teknisi: Evaluasi guide/bracket cell, pegas kontak, clearance plate vs ionizer, dan kemungkinan vibrasi; siapkan alat ukur & spare ringan (spring/contact board/insulator).
+Tim kami akan menghubungi untuk konfirmasi jadwal. Bila CHECK tiba-tiba menjadi persisten atau muncul arcing besar, mohon matikan daya dan kabari kami—tiket akan diprioritaskan.
+
+
+CLN-DRY-001 — Cell/prefilter basah saat dipasang
+1) Skenario: Customer tidak paham teknis (akhirnya resolved – dikeringkan tuntas)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang terlihat atau terdengar di unitnya sekarang?
+Customer: Tadi habis dicuci. Setelah dipasang, lampu CHECK nyala.
+[NAMA AI AGENT]: Baik. Saya pastikan dulu: tidak ada bau terbakar, asap, atau percikan besar, ya?
+Customer: Tidak ada.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Rosi.
+[NAMA AI AGENT]: Baik, Bu Rosi. Tadi saat memasang kembali, cell/prefilter dalam keadaan benar-benar keringatau masih agak lembap?
+Customer: Mungkin masih agak lembap.
+[NAMA AI AGENT]: Baik. Kita lakukan langkah aman dulu. Mohon matikan sakelar unitnya.
+Customer: Sudah.
+[NAMA AI AGENT]: Buka pintu unit. Tolong keluarkan cell dan prefilter pelan-pelan. Bila ada air yang menetes dari sudut/tube penyangga, miringkan sebentar agar airnya keluar.
+Customer: Oke, ada sedikit air keluar.
+[NAMA AI AGENT]: Silakan lap kering bagian yang basah. Lalu angin-anginkan 15–30 menit (boleh diarahkan ke kipas). Pastikan saat disentuh tidak dingin/lembap sama sekali.
+Customer: Baik… sudah terasa kering.
+[NAMA AI AGENT]: Mohon lap ringan kawat ionizer dan contact board dengan kain kering agar tidak ada sisa lembap.
+Customer: Sudah.
+[NAMA AI AGENT]: Sekarang pasang kembali prefilter dan cell sampai duduk rapat, tutup pintu rapat, lalu nyalakan. Setelah menyala, tekan TEST 10–15 detik. Bagaimana, CHECK masih menyala?
+Customer: Sudah padam. Ada bunyi “cekrek” juga.
+[NAMA AI AGENT]: Baik, berarti penyebabnya cell/prefilter masih basah saat dipasang. Untuk catatan layanan, boleh nomor HP yang mudah dihubungi?
+Customer: 08xx-xxxx-9125.
+[NAMA AI AGENT]: Terima kasih. Ibu domisili di mana?
+Customer: Karawaci, Tangerang.
+[NAMA AI AGENT]: Baik, saya tulis ringkasannya:
+* Nama: Rosi
+* No. HP: 08xx-xxxx-9125
+* Alamat/Domisili: Karawaci, Tangerang
+* Jenis Layanan: Konsultasi (remote)
+* Keluhan: CHECK muncul setelah pemasangan usai cuci
+* Tindakan: Power OFF → keluarkan cell/prefilter → tiriskan/miringkan agar air keluar → lap kering → angin-anginkan 15–30 menit → lap ionizer & contact board → pasang rapat → TEST → indikator normal → resolved
+* Catatan: Hindari memasang saat masih lembap. Jika CHECK muncul lagi segera setelah benar-benar kering, kabari kami untuk evaluasi lanjut.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket – P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Apa gejala yang terjadi di unit EAC?
+Customer: Setelah cuci, saya keringkan >24 jam. Saat dipasang, tetap ada CHECK dan kadang terdengar “kretek” halus.
+[NAMA AI AGENT]: Ada bau hangus atau percikan besar?
+Customer: Tidak, hanya bunyi halus.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Dwi.
+[NAMA AI AGENT]: Baik, Pak Dwi. Konfirmasi: cell/prefilter kering total; tube/sudut sudah dicek tidak ada air tertinggal; ionizer & contact board dilap kering; benar begitu?
+Customer: Benar. Saya bahkan pakai blower dingin.
+[NAMA AI AGENT]: Saat TEST 30 detik, CHECK tetap menyala?
+Customer: Ya, tetap. Bunyi “kretek” muncul sesekali.
+[NAMA AI AGENT]: Orientasi arrow sudah sesuai arah aliran, dan spring contacts menekan dengan baik?
+Customer: Sudah sesuai, “klik”-nya terasa.
+[NAMA AI AGENT]: Baik. Karena lembap sudah dieliminasi namun CHECK/arcing ringan masih muncul, kemungkinan ada jejak kelembapan yang meninggalkan residu pada insulator/kolektor, hairline crack pada insulator, atau kontak yang butuh inspeksi lanjut. Ini lebih aman dicek teknisi onsite.
+[NAMA AI AGENT]: Boleh nomor HP aktif untuk update jadwal?
+Customer: 08xx-xxxx-4470.
+[NAMA AI AGENT]: Terima kasih. Alamat lokasi unit di mana, Pak?
+Customer: Kawasan Industri MM…, Cikarang.
+[NAMA AI AGENT]: Untuk penanganan, Bapak prefer servis onsite, ya?
+Customer: Ya, onsite.
+[NAMA AI AGENT]: Jika sempat, mohon foto label model/serial di bagian dalam pintu agar teknisi menyiapkan part yang sesuai.
+Customer: Oke, nanti saya kirim.
+[NAMA AI AGENT]: Terima kasih, Pak Dwi. Ini ringkasannya:
+* Nama: Dwi
+* No. HP: 08xx-xxxx-4470
+* Alamat: Kawasan Industri MM…, Cikarang
+* Jenis Layanan: Servis Onsite
+* Keluhan: CHECK setelah pemasangan usai cuci, meski telah kering >24 jam
+* Troubleshooting jarak jauh: Kering total + blower dingin; dicek tube/sudut tidak ada air; ionizer & contact board dilap; TEST 30 dtk tetap CHECK; arrow benar; spring contacts baik; ada arcing halus
+* Keputusan: Create Ticket – P2 (perlu teknisi onsite)
+* Catatan teknisi: Periksa insulator (residu/track/hairline crack), collector clearance, kondisi contact board/pegas, dan kemungkinan korosi ringan pasca lembap; siapkan alat ukur & part pengganti dasar.
+Jika bunyi “kretek” berubah menjadi percikan besar atau tercium bau hangus, mohon matikan daya dan kabari kami—tiket akan diprioritaskan.
+
+
+ION-WIRE-001 — Ionizer wire putus/bengkok
+1) Skenario: Customer tidak paham teknis (akhirnya need ticket – P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang terlihat atau terdengar di unitnya sekarang?
+Customer: Tadi kedengaran bunyi “kretek”, terus dicek katanya ada kawat tipis yang putus.
+[NAMA AI AGENT]: Baik. Saya pastikan dulu: tidak ada asap, bau hangus, atau percikan besar ya?
+Customer: Nggak ada.
+[NAMA AI AGENT]: Saya bicara dengan siapa?
+Customer: Putri.
+[NAMA AI AGENT]: Baik, Bu Putri. Untuk memastikan, unitnya sekarang dimatikan dulu, ya?
+Customer: Sudah dimatikan.
+[NAMA AI AGENT]: Terima kasih. Ibu ada membuka pintunya tadi atau hanya melihat dari luar?
+Customer: Dibukakan sama OB, kelihatan kawatnya kayak putus.
+[NAMA AI AGENT]: Mengerti. Kawat itu ionizer wire. Kalau putus, unit memang bisa bunyi “kretek” dan performanya turun. Ini tidak disarankan diperbaiki sendiri—lebih aman diganti/ditangani teknisi.
+[NAMA AI AGENT]: Boleh domisili Ibu di area mana?
+Customer: Manggarai, Jakarta Selatan.
+[NAMA AI AGENT]: Baik. Saya sarankan tetap OFF sampai teknisi datang. Kita jadwalkan kunjungan, ya.
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi untuk update?
+Customer: 08xx-xxxx-9011.
+[NAMA AI AGENT]: Terima kasih, Bu Putri. Nanti kami siapkan tim & spare yang sesuai. Jika bunyi makin besar atau muncul bau hangus, tetap jangan dinyalakan dan kabari kami. Saya tulis ringkasannya:
+* Nama: Putri
+* No. HP: 08xx-xxxx-9011
+* Alamat/Domisili: Manggarai, Jakarta Selatan
+* Jenis Layanan: Servis Onsite
+* Keluhan: Bunyi “kretek”; terlihat ionizer wire putus
+* Troubleshooting jarak jauh: Unit dimatikan; tidak ada asap/bau hangus; disarankan tidak mencoba memperbaiki sendiri
+* Keputusan: Create Ticket – P2 (perlu teknisi onsite)
+* Catatan teknisi: Bawa ionizer wire set/cell pengganti, cek tegangan kolektor, pegas kontak, dan kondisi insulator.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya operasional pulih via spare + tetap tiket untuk penggantian wire)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Gejalanya bagaimana di unit EAC?
+Customer: Ada “snap” tidak stabil. Saya buka, ionizer wire terlihat kendur/bengkok, tidak putus. Kami punya spare cell.
+[NAMA AI AGENT]: Ada bau hangus atau arcing besar?
+Customer: Tidak. Hanya arcing ringan.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Arman, maintenance.
+[NAMA AI AGENT]: Baik, Pak Arman. Mohon pastikan unit dalam kondisi OFF dan tunggu beberapa menit agar muatan hilang sebelum penanganan.
+Customer: Sudah OFF, siap.
+[NAMA AI AGENT]: Kita lakukan yang aman: jangan coba meluruskan kawat yang kendur. Silakan swap dengan spare cell yang siap pakai. Pastikan arrow orientasi benar, spring contacts terasa “klik”, lalu tutup pintu rapat dan nyalakan.
+Customer: Sudah diganti ke spare. Uji TEST, “snap” stabil, indikator normal.
+[NAMA AI AGENT]: Bagus. Operasionalnya kembali normal. Untuk cell yang kawatnya kendur, kami tetap sarankan diganti wire/servis cell oleh teknisi.
+[NAMA AI AGENT]: Boleh alamat lokasi unitnya, Pak?
+Customer: Kawasan Industri Delta…, Karawang.
+[NAMA AI AGENT]: Terima kasih. Untuk follow-up penggantian part, mohon nomor HP yang aktif.
+Customer: 08xx-xxxx-6655.
+[NAMA AI AGENT]: Siap, Pak Arman. Saya buatkan tiket penggantian wire/servis cell. Ini ringkasannya:
+* Nama: Arman
+* No. HP: 08xx-xxxx-6655
+* Alamat: Kawasan Industri Delta…, Karawang
+* Jenis Layanan: Servis Onsite (penggantian wire / servis cell)
+* Keluhan: Ionizer wire kendur/bengkok (tidak putus) → arcing ringan
+* Tindakan sementara: Unit OFF → pasang spare cell; orientasi benar; spring “klik”; uji TEST normal → operasional pulih
+* Keputusan: Create Ticket – P2 (servis cell / ganti wire)
+* Catatan teknisi: Bawa ionizer wire set untuk model terkait, inspeksi pegas kontak, insulator, dan verifikasi tegangan kolektor; evaluasi kemungkinan retension atau penggantian total cell jika perlu.
+Jika sebelum teknisi datang arcing kembali besar atau muncul bau hangus, mohon matikan daya dan kabari kami—tiket akan diprioritaskan.
+
+
+
+
+CEL-DEFORM-001 — Collector plate bengkok/menyentuh
+1) Skenario: Customer tidak paham teknis (akhirnya resolved – reposisi ringan, tanpa paksa)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Apa yang terlihat/terdengar dari unitnya sekarang?
+Customer: Ada bunyi “kretek” kecil dan kadang lampu CHECK nyala. Tadi dibilang platnya ada yang bengkok.
+[NAMA AI AGENT]: Baik. Ada asap, bau hangus, atau percikan besar?
+Customer: Nggak ada, cuma bunyi kecil.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Naya.
+[NAMA AI AGENT]: Baik, Bu Naya. Kita cek yang ringan dulu, aman dilakukan. Mohon matikan sakelar unit ya.
+Customer: Sudah.
+[NAMA AI AGENT]: Buka pintu unitnya. Lalu keluarkan cell pelan-pelan. Lihat dari samping: ada plat kolektor yang menempel/menyentuh tetangga atau rangka?
+Customer: Iya, ada yang nempel rangka.
+[NAMA AI AGENT]: Baik. Tanpa paksa ya, coba rapikan posisinya: gunakan kartu plastik/kayu tipis (jangan logam), selipkan di sela lalu geser pelan agar plat tidak menyentuh. Kalau terasa keras, jangan dipaksa.
+Customer: Bisa. Sudah agak renggang sekarang.
+[NAMA AI AGENT]: Bagus. Sekalian pastikan tidak ada sisa air/lembap di cell. Bila ragu, lap kering dan angin-anginkan sebentar.
+Customer: Sudah kering.
+[NAMA AI AGENT]: Silakan pasang kembali cell sampai duduk rapat, tutup pintu rapat, lalu nyalakan. Tekan TEST 10–15 detik—bagaimana bunyi/indikatornya?
+Customer: Bunyi “cekrek” normal, CHECK padam.
+[NAMA AI AGENT]: Oke, berarti tadi penyebabnya plat menyentuh frame. Sudah beres ya, Bu.
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi untuk catatan?
+Customer: 08xx-xxxx-7844.
+[NAMA AI AGENT]: Terima kasih. Ibu domisili di mana?
+Customer: Cimanggis, Depok.
+[NAMA AI AGENT]: Baik, saya tulis ringkasannya:
+* Nama: Naya
+* No. HP: 08xx-xxxx-7844
+* Alamat/Domisili: Cimanggis, Depok
+* Jenis Layanan: Konsultasi (remote)
+* Keluhan: Arcing kecil & CHECK; diduga collector plate bengkok/menyentuh
+* Tindakan: Power OFF → keluarkan cell → rapikan plat ringan dengan kartu plastik (tanpa paksa) → pastikan kering → pasang rapat → TEST normal, CHECK padam → resolved
+* Catatan: Jika kembali bengkok/menyentuh atau bunyi membesar, kabari kami—akan dijadwalkan teknisi.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket – P2)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Gejala yang terlihat bagaimana, Pak/Bu?
+Customer: Ada arcing berulang. Visual: beberapa collector plate tampak bengkok dan dua bilah saling menyentuh.
+[NAMA AI AGENT]: Ada bau hangus atau percikan besar?
+Customer: Tidak besar, tapi sering.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Bima.
+[NAMA AI AGENT]: Baik, Pak Bima. Konfirmasi: unit sudah OFF dan muatan dibiarkan hilang sebelum inspeksi?
+Customer: Sudah OFF dan menunggu beberapa menit.
+[NAMA AI AGENT]: Terima kasih. Apakah sempat mencoba realign ringan (tanpa paksa) dengan alat non-logam?
+Customer: Sudah dicoba. Sebagian kembali, tapi dua bilah tetap bergesekan saat dipasang.
+[NAMA AI AGENT]: Dipastikan cell kering dan contact board/insulator bersih?
+Customer: Kering dan bersih.
+[NAMA AI AGENT]: Baik. Karena ada deformasi struktural yang tidak bisa dirapikan ringan, ini perlu teknisi onsite—opsi perbaikan jig/setting, atau penggantian cell bila perlu.
+[NAMA AI AGENT]: Boleh nomor HP aktif untuk update kunjungan?
+Customer: 08xx-xxxx-8891.
+[NAMA AI AGENT]: Terima kasih. Alamat lokasi unit di mana, Pak?
+Customer: Kawasan Logistik… Semarang.
+[NAMA AI AGENT]: Untuk penanganan, Bapak prefer servis onsite, ya?
+Customer: Ya, onsite.
+[NAMA AI AGENT]: Jika sempat, mohon foto label model/serial di kabinet—agar teknisi menyiapkan part yang tepat.
+Customer: Siap, saya kirim.
+[NAMA AI AGENT]: Terima kasih, Pak Bima. Berikut ringkasannya:
+* Nama: Bima
+* No. HP: 08xx-xxxx-8891
+* Alamat: Kawasan Logistik…, Semarang
+* Jenis Layanan: Servis Onsite
+* Keluhan: Arcing berulang; collector plate bengkok/menyentuh
+* Troubleshooting jarak jauh: OFF & discharge time dilakukan; realign ringan non-logam dicoba—gagal untuk dua bilah; cell kering, insulator/contact board bersih; arcing tetap ada
+* Keputusan: Create Ticket – P2 (perlu teknisi onsite)
+* Catatan teknisi: Siapkan cell/collector assembly pengganti, alat jig realignment, cek clearance antar plate, spring contacts, dan integritas insulator; verifikasi tegangan kolektor pasca perbaikan.
+Jika arcing berubah menjadi percikan besar atau muncul bau hangus, mohon matikan daya dan kabari kami—tiket akan diprioritaskan.
+
+
+
+
+
+
+OZN-ODOR-001 — Bau ozon kuat
+1) Skenario: Customer tidak paham teknis (akhirnya resolved – ventilasi + rencana cuci)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang dirasakan di area unitnya?
+Customer: Baunya tajam, kayak bau ozon.
+[NAMA AI AGENT]: Baik. Ada rasa perih di mata/tenggorokan atau pusing? Kalau terasa mengganggu, silakan tambah ventilasi dulu, ya.
+Customer: Nggak sampai perih, cuma agak menyengat.
+[NAMA AI AGENT]: Baik. Saya bicara dengan siapa?
+Customer: Mela.
+[NAMA AI AGENT]: Terima kasih, Bu Mela. Unitnya ini baru dipasang beberapa hari, atau sudah lama terpakai?
+Customer: Sudah lama.
+[NAMA AI AGENT]: Saat ini ventilasi ruangan bagaimana? Jendela/Outdoor Air dari AHU cukup terbuka?
+Customer: Sepertinya kurang.
+[NAMA AI AGENT]: Oke. Mohon tingkatkan ventilasi dulu (buka OA/damper, atau buka jendela sebentar).
+Customer: Sudah saya buka.
+[NAMA AI AGENT]: Terakhir cuci cell kira-kira kapan, Bu?
+Customer: Sudah lama, mungkin lebih dari 6 bulan.
+[NAMA AI AGENT]: Mengerti. Untuk bau ozon yang terasa kuat, biasanya membantu kalau cell dalam kondisi bersih. Ibu berkenan kalau nanti saya pandu cuci ringan?
+Customer: Boleh, tapi mungkin besok. Sekarang lagi ramai.
+[NAMA AI AGENT]: Tidak apa-apa. Satu hal lagi: di unit Ibu ada carbon filter dipasang belum?
+Customer: Belum.
+[NAMA AI AGENT]: Baik. Setelah ventilasi ditambah tadi, baunya sedikit berkurang?
+Customer: Iya, lumayan berkurang.
+[NAMA AI AGENT]: Oke. Nanti solusinya dua arah: (1) cuci cell agar proses ionisasi lebih bersih, (2) opsi pasang carbon filter untuk menyerap sisa bau (khusus model non-UV).
+[NAMA AI AGENT]: Boleh nomor HP yang mudah dihubungi untuk follow-up penjadwalan cuci?
+Customer: 08xx-xxxx-3180.
+[NAMA AI AGENT]: Terima kasih. Ibu domisili di mana?
+Customer: Ciledug, Tangerang.
+[NAMA AI AGENT]: Baik, saya tulis ringkasannya:
+* Nama: Mela
+* No. HP: 08xx-xxxx-3180
+* Alamat/Domisili: Ciledug, Tangerang
+* Jenis Layanan: Konsultasi (remote)
+* Keluhan: Bau ozon kuat
+* Temuan cepat: Ventilasi kurang → setelah ditambah ventilasi, bau berkurang; cell belum dicuci >6 bulan; carbon filter belum terpasang (model non-UV)
+* Rencana tindak lanjut: Jadwalkan cuci cell; tawarkan pemasangan carbon filter untuk reduksi bau
+* Status: Resolved sementara (edukasi + ventilasi). Jika bau kembali kuat, lanjutkan ke cuci/pasang carbon filter.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket – P2 untuk konfigurasi EFFY/carbon filter)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Apa gejalanya di area unit EAC?
+Customer: Bau ozon cukup kuat di dekat supply. Unit non-UV, cell rutin dicuci 1–2 bulan sekali.
+[NAMA AI AGENT]: Ada keluhan iritasi atau arcing keras?
+Customer: Tidak ada arcing keras. Iritasi ringan kalau lama di dekat supply.
+[NAMA AI AGENT]: Saya berbicara dengan siapa?
+Customer: Riko.
+[NAMA AI AGENT]: Baik, Pak Riko. Ventilasi/OA saat ini sudah dibuka cukup?
+Customer: Sudah ditingkatkan, bau tetap terasa.
+[NAMA AI AGENT]: Carbon filter terpasang?
+Customer: Belum ada. Kami juga tertarik opsi turunkan ozon kalau memungkinkan.
+[NAMA AI AGENT]: Baik. Untuk non-UV, ada dua opsi teknis:
+— Pemasangan carbon filter untuk menyerap bau.
+— Setting EFFY jumper agar produksi ozon turun (catatan: ada trade-off efisiensi).
+Dengan kondisi ventilasi sudah ditambah dan cell bersih, saya sarankan kunjungan teknisi untuk pasang carbon filter dan/atau set EFFY sesuai preferensi.
+[NAMA AI AGENT]: Boleh alamat lokasi unitnya, Pak?
+Customer: Office Park…, Jakarta Selatan.
+[NAMA AI AGENT]: Terima kasih. Mohon nomor HP aktif untuk update jadwal.
+Customer: 08xx-xxxx-7752.
+[NAMA AI AGENT]: Siap, Pak Riko. Ini ringkasannya:
+* Nama: Riko
+* No. HP: 08xx-xxxx-7752
+* Alamat: Office Park…, Jakarta Selatan
+* Jenis Layanan: Servis Onsite (konfigurasi)
+* Keluhan: Bau ozon kuat di dekat supply
+* Troubleshooting jarak jauh: Ventilasi/OA sudah ditingkatkan; cell rutin bersih; model non-UV; carbon filter belum terpasang; ingin menurunkan ozon
+* Rekomendasi teknis: Pasang carbon filter dan/atau set EFFY jumper (dengan trade-off efisiensi)
+* Keputusan: Create Ticket – P2 (kunjungan teknisi untuk konfigurasi/instalasi)
+Jika bau tiba-tiba makin kuat atau muncul gejala iritasi yang mengganggu, mohon menjauh dari area supply, tingkatkan ventilasi, dan kabari kami—tiket akan diprioritaskan.
+
+
+
+
+OZN-CARB-001 — Perlu carbon filter 202614
+1) Skenario: Customer tidak paham teknis (akhirnya need ticket – P2 untuk pasang carbon filter 202614 pada non-UV)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Apa yang Ibu/Bapak rasakan di area unitnya?
+Customer: Baunya seperti ozon, agak menyengat.
+[NAMA AI AGENT]: Mengerti. Ada keluhan perih di mata/tenggorokan? Kalau terasa mengganggu, boleh tambah ventilasi dulu ya.
+Customer: Nggak sampai perih, cuma mengganggu.
+[NAMA AI AGENT]: Saya bicara dengan siapa?
+Customer: Santi.
+[NAMA AI AGENT]: Baik, Bu Santi. Unitnya pakai lampu UV atau tidak?
+Customer: Tidak pakai UV.
+[NAMA AI AGENT]: Oke. Untuk unit non-UV, kita bisa tambahkan carbon filter tipe 202614 untuk mengurangi bau. Ibu setuju jika kami jadwalkan pemasangan?
+Customer: Iya, tolong dipasang.
+[NAMA AI AGENT]: Baik. Ibu domisili di mana?
+Customer: Serpong, Tangerang Selatan.
+[NAMA AI AGENT]: Terima kasih. Boleh nomor HP yang aktif untuk update jadwal?
+Customer: 08xx-xxxx-1123.
+[NAMA AI AGENT]: Noted, Bu. Sambil menunggu teknisi, mohon tingkatkan ventilasi dan pastikan cell tetap bersihya (kalau terakhir cuci sudah lama, nanti kita bantu jadwalkan cuci juga). Saya tulis ringkasannya:
+* Nama: Santi
+* No. HP: 08xx-xxxx-1123
+* Alamat/Domisili: Serpong, Tangerang Selatan
+* Jenis Layanan: Servis Onsite (pasang carbon filter 202614)
+* Keluhan: Bau ozon terasa menyengat
+* Kondisi unit: Non-UV (cocok gunakan 202614); ventilasi bisa ditingkatkan sementara
+* Keputusan: Create Ticket – P2 (jadwalkan pemasangan carbon filter 202614 + opsional penjadwalan cuci cell)
+Tim kami akan menghubungi Ibu untuk konfirmasi jadwal dan ketersediaan part. Bila baunya tiba-tiba kuat sekali, silakan tambah ventilasi dan kabari kami.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket – P2 untuk supply/instal 202614; validasi kompatibilitas)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Apa yang Bapak ingin kerjakan di unit EAC?
+Customer: Kami ingin carbon filter 202614 untuk reduksi ozon. Model kami non-UV.
+[NAMA AI AGENT]: Baik. Ada keluhan iritasi atau bau yang kuat di area supply?
+Customer: Bau terasa di dekat supply, iritasi ringan kalau lama.
+[NAMA AI AGENT]: Mengerti. Terakhir cuci cell kapan, Pak?
+Customer: Sebulan lalu. Rutin.
+[NAMA AI AGENT]: Ventilasi/OA saat ini cukup terbuka?
+Customer: Sudah kami tingkatkan, tetap tercium.
+[NAMA AI AGENT]: Baik. Untuk non-UV, 202614 sesuai. Perlu diinfokan bahwa carbon filter menambah adsorpsi ozon; kita pastikan lokasi pemasangan dan akses servisnya rapi, serta cek dampak pressure drop ke sistem. Setuju jika kami supply dan instal?
+Customer: Setuju.
+[NAMA AI AGENT]: Alamat lokasinya di mana, Pak?
+Customer: Kawasan Perkantoran Sudirman…, Jakarta.
+[NAMA AI AGENT]: Baik. Mohon nomor HP aktif untuk koordinasi teknisi.
+Customer: 08xx-xxxx-5579.
+[NAMA AI AGENT]: Terima kasih. Jika nanti Bapak juga ingin turunkan ozon lebih jauh, ada opsi setting EFFY(dengan trade-off efisiensi), bisa kita konsultasikan saat teknisi di lokasi. Saya tulis ringkasannya:
+* Nama: (Maintenance)
+* No. HP: 08xx-xxxx-5579
+* Alamat: Kawasan Perkantoran Sudirman…, Jakarta
+* Jenis Layanan: Supply & Instal Carbon Filter 202614 (non-UV)
+* Keluhan: Bau ozon terasa di dekat supply
+* Kondisi unit: Non-UV, cell rutin bersih, ventilasi sudah ditingkatkan
+* Catatan teknis: Validasi ruang pemasangan & pressure drop; opsi tambahan EFFY bila diinginkan (ada trade-offefisiensi)
+* Keputusan: Create Ticket – P2 (jadwalkan instal 202614; siapkan part & perlengkapan pemasangan)
+Jika ternyata saat teknisi datang unitnya UV, kami tidak akan memasang 202614 di model UV dan akan menawarkan opsi lain (mis. penyesuaian setelan/strategi berbeda) agar tetap sesuai spesifikasi.
+
+
+
+
+
+
+OZN-EFFY-001 — Minta EFFY jumper (trade-off)
+1) Skenario: Customer tidak paham teknis (akhirnya need ticket – P2 untuk set EFFY)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Boleh cerita, apa yang Ibu/Bapak rasakan di area unitnya?
+Customer: Baunya seperti ozon, kami ingin diturunkan saja.
+[NAMA AI AGENT]: Mengerti. Sebelumnya, ada rasa perih di mata atau pusing? Kalau agak mengganggu, boleh tambahkan ventilasi dulu ya.
+Customer: Tidak sampai perih, tapi baunya menyengat.
+[NAMA AI AGENT]: Baik. Saya bicara dengan siapa?
+Customer: Vivi.
+[NAMA AI AGENT]: Terima kasih, Bu Vivi. Di unit Ibu ada modul UV atau tidak?
+Customer: Tidak ada UV.
+[NAMA AI AGENT]: Oke. Di tipe non-UV, kita bisa menurunkan produksi ozon lewat setting EFFY. Catatan penting: kalau EFFY diturunkan, efisiensi penangkapan partikel juga ikut turun. Apakah Ibu setuju dengan konsekuensi itu?
+Customer: Kalau bisa baunya berkurang, kami setuju.
+[NAMA AI AGENT]: Baik. Kita jadwalkan teknisi untuk set EFFY di papan kontrol, ya.
+[NAMA AI AGENT]: Ibu domisilinya di mana?
+Customer: Gunung Sahari, Jakarta Pusat.
+[NAMA AI AGENT]: Baik. Boleh minta nomor HP aktif untuk update jadwal?
+Customer: 08xx-xxxx-4108.
+[NAMA AI AGENT]: Terima kasih. Sambil menunggu teknisi, boleh ditambah ventilasinya. Kalau ingin lebih maksimal, nanti teknisi juga bisa tawarkan carbon filter sebagai opsi tambahan. Saya tulis ringkasannya:
+* Nama: Vivi
+* No. HP: 08xx-xxxx-4108
+* Alamat/Domisili: Gunung Sahari, Jakarta Pusat
+* Jenis Layanan: Servis Onsite (konfigurasi)
+* Keluhan/Permintaan: Minta turunkan ozon
+* Solusi yang diminta: Set EFFY jumper (ozon turun dengan trade-off efisiensi)
+* Status: Create Ticket – P2 (kunjungan teknisi)
+* Catatan teknisi: Verifikasi model non-UV, lakukan setting EFFY sesuai spek; uji TEST, cek CHECK pasca-setting; edukasi dampak efisiensi; opsional penawaran carbon filter bila dibutuhkan.
+________________
+
+
+2) Skenario: Customer paham teknis (akhirnya need ticket – P2 untuk set EFFY + opsi kombinasi)
+[NAMA AI AGENT]: Siang, saya [NAMA AI AGENT]. Apa yang ingin Bapak lakukan pada unit EAC?
+Customer: Kami ingin set EFFY untuk menurunkan ozon. Paham risikonya.
+[NAMA AI AGENT]: Baik. Saya berbicara dengan siapa?
+Customer: Yoga, maintenance.
+[NAMA AI AGENT]: Baik, Pak Yoga. Unitnya non-UV atau ada UV module?
+Customer: Non-UV.
+[NAMA AI AGENT]: Noted. Saat ini ventilasi/OA sudah ditingkatkan dan cell dalam kondisi bersih?
+Customer: Ya, OA sudah naik dan cell rutin bersih.
+[NAMA AI AGENT]: Baik. Konfirmasi: Bapak menerima trade-off bahwa efisiensi penangkapan turun setelah EFFYditurunkan?
+Customer: Ya, kami terima. Prioritasnya reduksi bau.
+[NAMA AI AGENT]: Oke. Kita akan jadwalkan teknisi untuk set EFFY. Jika nanti masih tercium, kami bisa kombinasikan dengan carbon filter—konsekuensinya ada tambahan pressure drop yang harus kita cek terhadap sistem.
+[NAMA AI AGENT]: Alamat lokasi unitnya di mana, Pak?
+Customer: Kawasan Bisnis Mega…, Jakarta Selatan.
+[NAMA AI AGENT]: Baik. Mohon nomor HP aktif untuk koordinasi.
+Customer: 08xx-xxxx-6574.
+[NAMA AI AGENT]: Terima kasih, Pak Yoga. Berikut ringkasannya:
+* Nama: Yoga (Maintenance)
+* No. HP: 08xx-xxxx-6574
+* Alamat: Kawasan Bisnis Mega…, Jakarta Selatan
+* Jenis Layanan: Servis Onsite (konfigurasi)
+* Permintaan: Set EFFY jumper untuk turunkan ozon
+* Kondisi awal: Non-UV, OA/ventilasi sudah ditingkatkan, cell rutin bersih
+* Keputusan: Create Ticket – P2 (kunjungan teknisi)
+* Catatan teknisi: Lakukan setting EFFY sesuai prosedur; verifikasi hasil (uji TEST, pantau CHECK); dokumentasikan perubahan; diskusikan opsi carbon filter bila reduksi tambahan diperlukan dan evaluasi pressure drop.
+Jika setelah EFFY disetel masih ada keluhan tajam di area supply, mohon kabari kami—teknisi akan evaluasi opsi tambahan (mis. carbon filter) atau penyesuaian lain yang aman bagi sistem.

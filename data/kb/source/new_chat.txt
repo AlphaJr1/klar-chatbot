@@ -1,0 +1,57 @@
+chat bunyi tas tas
+C: Halo, alat saya bunyi tas tas, kenapa ya?
+A: Selamat pagi! Terima kasih telah memberi tahu kami tentang masalah bunyinya . Saya dengan Ninda, boleh tau dengan siapa saya beribicara?
+C: Saya Cinta
+A: Baik Kak Cinta, sebetulnya bunyi ‘tas tas’ itu wajar kalau ngga sering kak, berarti alatnya berfungsi dengan baik untuk memecah partikel asap pake aliran listrik. Tp kalo sering bunyinya, berarti alatnya perlu dicuci kak. Kalo boleh tau bunyinya jarang-jarang atau bunyinya sering dan terus-menerus ya?
+C: bunyinya sering kak
+A: baik Kak Cinta,  boleh kami jadwalkan teknisi untuk cleaning device-nya? 
+C: boleh kak
+A: Baik kak, kami akan menghubungi kakak kembali terkait penjadwalan teknisinya
+(Status: pending)
+
+chat bunyi kipas keras
+C: Halo, kipasnya koq bunyinya ga seperti biasanya ya kak?
+A: Selamat pagi! Terima kasih telah memberi tahu kami tentang masalah bunyinya . Saya dengan Ninda, boleh tau dengan siapa saya berbicara?
+C: Saya Cinta
+A: Baik Kak Cinta, apakah bunyinya keras atau lemah ya kak?
+C: bunyinya keras kak
+A: baik Kak Cinta,  kemungkinan ada kerusakan pada dinamonya, boleh kami jadwalkan teknisi untuk cleaning device-nya? 
+C: (ga jawab > 2 menit)
+A: Kami masih menunggu respon dari kakak sampai hari ini 23:59, silakan menghubungi kami kembali jika sudah bersedia untuk dijadwalkan servisnya. Thank you and have a nice day (no response within a day, status: resolved, kalo dibales, jadi pending)
+C: (bales besoknya) oke kak
+A: Mohon maaf, chat kakak sudah terhapus dari sistem kami karena sudah lewat sehari. Apakah boleh menyampaikan masalahnya kembali?
+
+chat bunyi kipas lemah
+C: Halo, kipasnya koq bunyinya ga seperti biasanya ya kak?
+A: Selamat pagi! Terima kasih telah memberi tahu kami tentang masalah bunyinya . Saya dengan Ninda, boleh tau dengan siapa saya berbicara?
+C: Saya Cinta
+A: Baik Kak Cinta, apakah bunyinya keras atau lemah ya kak? 
+C: kipasnya hampir ga kedengeran kak
+A: baik Kak Cinta,  kemungkinan ada kerusakan pada kapasitor atau dinamonya, boleh kami jadwalkan teknisi untuk cleaning device-nya? 
+C: boleh kak
+A: Baik kak, kami akan menghubungi kakak kembali terkait penjadwalan teknisinya
+(Status: pending)
+
+chat alat mati 
+C: Halo, alat saya koq (mati/lampu indikator kuning yg biasanya nyala koq ga nyala), kenapa ya?
+A: Selamat pagi! Terima kasih telah memberi tahu kami tentang masalah alatnya yang mati . Saya dengan Ninda, boleh tau dengan siapa saya berbicara?
+C: Saya Romi
+A: Baik Kak Romi, boleh coba ikuti panduan berikut:
+	1. Pastikan covernya terposisikan dengan rapat
+	2. Pastikan alaatnya sudah tercolok ke sumber listrik
+	3. Pastikan MCB sudah di posisi on
+C: MCB itu apa kak?
+A: MCB adalah sakelar pengaman yang memutus aliran listrik secara otomatis ketika terjadi kelebihan beban (overload) atau korsleting untuk melindungi instalasi dan perangkat elektronik dari kerusakan serta mencegah risiko kebakaran (kirim gambar)
+C: Alatnya masih mati kak
+A: baik Kak Cinta,  sepertinya power supply pada alatnya bermasalah. Boleh kami jadwalkan teknisi untuk cleaning device-nya? 
+C: boleh kak
+A: Baik kak, kami akan menghubungi kakak kembali terkait penjadwalan teknisinya
+(Status: pending)
+
+lampu indikator
+C: Halo, saya pengen tau arti lampu indikator kuning dan merah di device-nya kak.
+A: Selamat pagi! Terima kasih telah menghubungi kami. Saya dengan Ninda, boleh tau dengan siapa saya berbicara?
+C: Saya Romi
+A: Baik Kak Romi, lampu indikator kuning akan selalu menyala jika unit normal. Lampu indikator merah yang menyala redup berarti unitnya bersih, tetapi jika lampu merahnya menyala terang berarti alatnya kotor dan perlu segera dibersihkan
+C: oh ok, thank u ya
+A: sama-sama Kak. Apakah masih ada pertanyaan lagi? (if no reply within 2 minutes, status: resolved)
