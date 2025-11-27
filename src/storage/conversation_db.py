@@ -32,13 +32,50 @@ class ConversationDB:
     
     def _read_db(self) -> Dict[str, Any]:
         with self._lock:
-            with open(self.db_path, "r", encoding="utf-8") as f:
-                return json.load(f)
+            try:
+                with open(self.db_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    data = json.loads(content)
+                    return data
+            except json.JSONDecodeError as e:
+                print(f"[DB] ❌ JSON error in {self.db_path}: {e}")
+                backup_path = f"{self.db_path}.corrupted.backup"
+                import shutil
+                shutil.copy(self.db_path, backup_path)
+                print(f"[DB] 📦 Corrupt file backed up to {backup_path}")
+                print(f"[DB] 🔄 Reinitializing database...")
+                
+                initial_data = {
+                    "version": "1.0",
+                    "lastFullSync": None,
+                    "conversations": {},
+                    "stats": {
+                        "totalConversations": 0,
+                        "totalMessages": 0,
+                        "lastSyncDuration": 0
+                    }
+                }
+                with open(self.db_path, "w", encoding="utf-8") as f:
+                    json.dump(initial_data, f, indent=2, ensure_ascii=False)
+                return initial_data
     
     def _write_db(self, data: Dict[str, Any]):
         with self._lock:
-            with open(self.db_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
+            temp_path = f"{self.db_path}.tmp"
+            try:
+                with open(temp_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, indent=2, ensure_ascii=False)
+                
+                with open(temp_path, "r", encoding="utf-8") as f:
+                    json.load(f)
+                
+                import shutil
+                shutil.move(temp_path, self.db_path)
+            except Exception as e:
+                print(f"[DB] ❌ Error writing database: {e}")
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                raise
     
     def get_conversation(self, phone_number: str) -> Optional[Dict[str, Any]]:
         data = self._read_db()

@@ -20,7 +20,13 @@ class ConversationSync:
             response = requests.get(url, timeout=self.timeout)
             response.raise_for_status()
             
-            data = response.json()
+            try:
+                data = response.json()
+            except ValueError as json_err:
+                print(f"[SYNC] JSON parsing error: {json_err}")
+                print(f"[SYNC] Response preview: {response.text[:500]}")
+                return None
+            
             if data.get("success") and "conversations" in data:
                 return data["conversations"]
             
@@ -36,7 +42,13 @@ class ConversationSync:
             response = requests.get(url, timeout=self.timeout)
             response.raise_for_status()
             
-            data = response.json()
+            try:
+                data = response.json()
+            except ValueError as json_err:
+                print(f"[SYNC] JSON parsing error for {phone_number}: {json_err}")
+                print(f"[SYNC] Response preview: {response.text[:500]}")
+                return None
+            
             if data.get("success") and "messages" in data:
                 return data["messages"]
             
@@ -53,11 +65,15 @@ class ConversationSync:
             if messages is None:
                 return False
             
+            print(f"[SYNC] Fetched {len(messages)} messages for {phone_number}")
+            
             existing = self.db.get_conversation(phone_number)
             
             if existing:
+                print(f"[SYNC] Updating existing conversation for {phone_number}")
                 self.db.update_messages(phone_number, messages)
             else:
+                print(f"[SYNC] Creating new conversation for {phone_number}")
                 metadata = {
                     "lastMessage": messages[-1].get("text", "") if messages else "",
                     "lastTimestamp": messages[-1].get("timestamp", "") if messages else "",
@@ -65,10 +81,13 @@ class ConversationSync:
                 }
                 self.db.save_conversation(phone_number, metadata, messages)
             
+            print(f"[SYNC] ✅ Successfully synced {phone_number}")
             return True
         
         except Exception as e:
             print(f"[SYNC] Error sync conversation {phone_number}: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def sync_all(self) -> Dict[str, Any]:

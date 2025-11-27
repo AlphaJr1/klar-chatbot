@@ -97,7 +97,7 @@ def chat(payload: ChatIn):
             parts = user_text.split()
             if len(parts) >= 3 and parts[2] == ADMIN_SECRET:
                 try:
-                    engine.memory.clear(payload.user_id)
+                    engine.memstore.clear(payload.user_id)
                     return {
                         "bubbles": [{"type": "text", "text": f"✅ Memory reset berhasil untuk user: {payload.user_id}"}],
                         "next": "await_reply",
@@ -107,6 +107,36 @@ def chat(payload: ChatIn):
                 except Exception as e:
                     return {
                         "bubbles": [{"type": "text", "text": f"❌ Gagal reset memory: {str(e)}"}],
+                        "next": "await_reply",
+                        "status": "open",
+                        "meta": {"error": str(e)}
+                    }
+            else:
+                return {
+                    "bubbles": [{"type": "text", "text": "❌ Invalid secret key"}],
+                    "next": "await_reply",
+                    "status": "open",
+                    "meta": {"error": "invalid_secret"}
+                }
+        
+        if user_text.startswith("/dev pending "):
+            parts = user_text.split(maxsplit=2)
+            if len(parts) >= 3 and parts[2] == ADMIN_SECRET:
+                try:
+                    engine.memstore.set_flag(payload.user_id, "sop_pending", True)
+                    
+                    name_question = engine.data_collector.generate_question(payload.user_id, "name")
+                    engine.memstore.append_history(payload.user_id, "bot", name_question)
+                    
+                    return {
+                        "bubbles": [{"type": "text", "text": name_question}],
+                        "next": "await_reply",
+                        "status": "open",
+                        "meta": {"admin_action": "force_pending", "user_id": payload.user_id}
+                    }
+                except Exception as e:
+                    return {
+                        "bubbles": [{"type": "text", "text": f"❌ Gagal trigger pending: {str(e)}"}],
                         "next": "await_reply",
                         "status": "open",
                         "meta": {"error": str(e)}
@@ -165,6 +195,7 @@ def chat(payload: ChatIn):
     except Exception as e:
         print(f"[ERROR] chat: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 class SendIn(BaseModel):
     to: str
@@ -282,7 +313,7 @@ def admin_reset_memory(user_id: str, secret: str = Query(...)):
         raise HTTPException(status_code=403, detail="Invalid secret key")
     
     try:
-        engine.memory.clear(user_id)
+        engine.memstore.clear(user_id)
         return {
             "ok": True,
             "message": f"Memory reset berhasil untuk user: {user_id}",
@@ -300,8 +331,8 @@ def admin_memory_stats(secret: str = Query(...)):
         raise HTTPException(status_code=403, detail="Invalid secret key")
     
     try:
-        stats = engine.memory.stats()
-        all_users = list(engine.memory._records.keys())
+        stats = engine.memstore.stats()
+        all_users = list(engine.memstore._records.keys())
         return {
             "ok": True,
             "stats": stats,
@@ -311,6 +342,7 @@ def admin_memory_stats(secret: str = Query(...)):
     except Exception as e:
         print(f"[ERROR] admin_memory_stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 # === Run manual ===
 # uvicorn src.api:app --host 0.0.0.0 --port 8080 --reload

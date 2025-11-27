@@ -111,3 +111,73 @@ DATA PELANGGAN:
 STATUS & TINDAKAN SELANJUTNYA:
 - Status: [open/pending/resolved]
 - Tindakan: [apa yang perlu dilakukan admin/teknisi]
+"""
+        
+        try:
+            response = self.ollama.generate(system, prompt, temperature=0.2)
+            return response.strip()
+        except Exception as e:
+            print(f"[SUMMARIZER] LLM error: {e}")
+            return f"Error generating summary: {str(e)}"
+    
+    def send_summary_to_node(self, session_id: str, summary: str) -> bool:
+        try:
+            endpoint = f"{self.node_server_url}/api/receive-summary"
+            payload = {
+                "session_id": session_id,
+                "summary": summary,
+                "generated_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            response = requests.post(endpoint, json=payload, timeout=10)
+            response.raise_for_status()
+            
+            return True
+        
+        except Exception as e:
+            print(f"[SUMMARIZER] Error sending to node: {e}")
+            return False
+    
+    def summarize(
+        self, 
+        session_id: str, 
+        messages: Optional[List[Dict[str, Any]]] = None,
+        use_local_logs: bool = False,
+        send_to_node: bool = False,
+        auto_update: bool = True
+    ) -> Dict[str, Any]:
+        
+        if messages is None:
+            if use_local_logs:
+                messages = self.fetch_conversation_from_logs(session_id)
+            elif auto_update:
+                print(f"[SUMMARIZER] Fetching updates for {session_id}...")
+                messages = self.sync_service.get_conversation_for_summary(session_id)
+            else:
+                messages = self.fetch_conversation_from_node(session_id)
+        
+        if not messages:
+            return {
+                "success": False,
+                "error": "No messages found",
+                "session_id": session_id
+            }
+        
+        conversation_text = self.prepare_conversation_text(messages)
+        summary = self.summarize_with_llm(conversation_text)
+        
+        if send_to_node:
+            self.send_summary_to_node(session_id, summary)
+        
+        source = "local_logs" if use_local_logs else ("sync_db" if auto_update else "node_server")
+        
+        return {
+            "success": True,
+            "session_id": session_id,
+            "summary": summary,
+            "message_count": len(messages),
+            "metadata": {
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+                "source": source
+            }
+        }

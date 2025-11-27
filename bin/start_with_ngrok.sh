@@ -3,7 +3,7 @@
 # Startup Script dengan Ngrok Tunnel
 # Usage: ./start_with_ngrok.sh [port]
 
-PORT=${1:-8081}
+PORT=${1:-8080}
 
 echo "═══════════════════════════════════════════════════════════"
 echo "🚀 Starting Klar-RAG API Server + Ngrok Tunnel"

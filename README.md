@@ -2,161 +2,248 @@
 
 Intelligent conversation engine untuk Honeywell Electronic Air Cleaner customer support dengan troubleshooting automation dan data collection.
 
-## 📁 Project Structure
+## 📋 Prerequisites
 
-```
-klar-rag/
-├── src/                    # Source code
-│   ├── api.py             # FastAPI server
-│   ├── convo/             # Conversation engine
-│   │   ├── engine.py      # Main conversation engine
-│   │   ├── data_collector.py
-│   │   ├── memory_store.py
-│   │   ├── ollama_client.py
-│   │   └── session_logger.py
-│   └── retriever/         # RAG retriever components
-│       └── retriever.py
-│
-├── tests/                  # Test files
-│   └── convo/
-│       ├── test_comprehensive.py
-│       ├── test_data_collection.py
-│       └── test_stress_full_flow.py
-│
-├── data/                   # Data & storage
-│   ├── kb/                # Knowledge base
-│   │   └── sop.json       # Standard Operating Procedures
-│   └── storage/           # Runtime data
-│       ├── logs/          # Session & LLM logs
-│       ├── qdrant/        # Vector database storage
-│       └── memory.json    # User memory & state
-│
-├── scripts/                # Utility scripts
-│   ├── build/             # Build scripts
-│   └── ingestion/         # Data ingestion scripts
-│
-└── docs/                   # Documentation
-    ├── CLEANUP_REPORT.md
-    └── RESTRUCTURE_STATUS.md
-```
+### 1. Python Environment
 
-## 🚀 Quick Start
-
-### Prerequisites
+- Python 3.10 atau lebih tinggi
+- pip untuk manajemen package
 
 ```bash
-# Python 3.10+
-python --version
+python --version  # pastikan >= 3.10
+```
 
-# Install dependencies
+### 2. Ollama & Qwen2.5:7B-Instruct
+
+**Install Ollama:**
+
+```bash
+# MacOS
+brew install ollama
+
+# Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Windows
+# Download dari https://ollama.com/download
+```
+
+**Jalankan Ollama Server:**
+
+```bash
+ollama serve
+```
+
+**Download dan Test Qwen2.5:7B-Instruct:**
+
+```bash
+# Download model (sekitar 4.7GB)
+ollama pull qwen2.5:7b-instruct
+
+# Test model
+ollama run qwen2.5:7b-instruct "Hello, how are you?"
+```
+
+Pastikan Ollama berjalan di `http://localhost:11434` (default port)
+
+## 🚀 Setup Project
+
+### 1. Clone Repository
+
+```bash
+git clone <repository-url>
+cd klar-rag
+```
+
+### 2. Setup Python Virtual Environment
+
+```bash
+# Buat virtual environment
+python -m venv .venv
+
+# Aktifkan virtual environment
+# MacOS/Linux:
+source .venv/bin/activate
+
+# Windows:
+.venv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### Running the API
+### 4. Setup Environment Variables
 
-**⚠️ IMPORTANT:** Must run from project root directory!
+Buat file `.env` di root directory:
 
 ```bash
-cd /Users/adrianalfajri/Projects/klar-rag
+cp .env.example .env  # atau buat manual
 ```
 
-**Option 1: Quick Start Script** (Recommended)
+Isi `.env`:
 
 ```bash
-# Development mode with auto-reload
-./start_server.sh
-
-# Custom port
-./start_server.sh 9000
-
-# Production mode
-./start_server.sh 8080 prod
+APP_PORT=8080
+NODE_SERVER_URL=https://your-webhook-url.ngrok-free.dev/api/send
+OLLAMA_BASE_URL=http://localhost:11434
 ```
 
-**Option 2: Direct uvicorn command**
+### 5. Setup Data Directories
 
 ```bash
-# Development mode (auto-reload on code changes)
+# Pastikan struktur folder sudah benar
+mkdir -p data/storage/logs
+mkdir -p data/storage/backups
+mkdir -p logs
+```
+
+## ▶️ Running the Server
+
+**PENTING:** Jalankan dari root directory project!
+
+### Development Mode (Recommended)
+
+```bash
+# Pastikan Ollama sudah berjalan
+# Terminal 1:
+ollama serve
+
+# Terminal 2:
 uvicorn src.api:app --host 0.0.0.0 --port 8080 --reload
-
-# Production mode (better performance)
-uvicorn src.api:app --host 0.0.0.0 --port 8080
-
-# Localhost only (more secure for development)
-uvicorn src.api:app --host 127.0.0.1 --port 8080 --reload
 ```
 
-**Testing if server is running:**
+### Production Mode
+
+```bash
+uvicorn src.api:app --host 0.0.0.0 --port 8080
+```
+
+### Verifikasi Server
+
+Test endpoint:
 
 ```bash
 # Health check
 curl http://localhost:8080/health
 
-# Test chat endpoint
+# Test chat
 curl -X POST http://localhost:8080/chat \
   -H "Content-Type: application/json" \
   -d '{"user_id": "test123", "text": "Halo"}'
 ```
 
-### Running Tests
+Expected response:
 
-```bash
-# Run all tests
-python -m pytest tests/
-
-# Run specific test
-python tests/convo/test_comprehensive.py
+```json
+{
+  "user_id": "test123",
+  "reply": "Halo! Ada yang bisa saya bantu?",
+  "memory": {...}
+}
 ```
-
-### Memory Management
-
-Mengelola memory chatbot (hapus user atau kosongkan semua):
-
-```bash
-# Versi Python (Recommended)
-python3 scripts/clear_memory.py
-
-# Versi Bash
-./bin/clear_memory.sh
-```
-
-**Fitur:**
-
-- **Opsi 1:** Hapus user_id tertentu (dengan list semua user)
-- **Opsi 2:** Kosongkan memory total
-- **Opsi 3:** Cancel (tidak ada perubahan)
-
-**Catatan:**
-
-- Script akan **otomatis stop server** sebelum proses
-- **Backup otomatis** dibuat di `data/storage/backups/`
-- Server akan **auto-restart** setelah selesai
-
-## 🔧 Configuration
-
-Environment variables (`.env`):
-
-```bash
-APP_PORT=8080
-NODE_SERVER_URL=https://your-webhook-url.ngrok-free.dev/api/send
-```
-
-## 📊 Features
-
-- **Intelligent Troubleshooting:** SOP-based automated troubleshooting flow
-- **Data Collection:** Natural conversation-based user data collection
-- **Memory Management:** Persistent user state and conversation history
-- **Session Logging:** Comprehensive logging for debugging and analytics
-- **RAG Integration:** Vector-based knowledge retrieval (optional)
-- **Webhook Integration:** Real-time updates to external systems
 
 ## 🧪 Testing
 
-The project includes comprehensive test suites:
+### Run Test Suite
 
-- `test_comprehensive.py` - End-to-end data collection tests
-- `test_data_collection.py` - LLM-simulated customer interactions
-- `test_stress_full_flow.py` - Stress testing with distractions
+```bash
+# Test sederhana
+python tests/test_smart_company.py
+
+# Test natural response
+python tests/test_natural_response.py
+
+# Test comprehensive
+python -m pytest tests/ -v
+```
+
+### Manual Testing
+
+```bash
+# Test konversi singkat
+python tests/quick_validation.py
+
+# Stress test
+python tests/stress_test_api.py
+```
+
+## 📁 Project Structure
+
+```
+klar-rag/
+├── src/
+│   ├── api.py              # FastAPI server
+│   ├── convo/
+│   │   ├── engine.py       # Main conversation engine
+│   │   ├── data_collector.py
+│   │   ├── memory_store.py
+│   │   ├── ollama_client.py
+│   │   └── session_logger.py
+│   └── retriever/
+│       └── retriever.py
+│
+├── tests/
+│   ├── test_smart_company.py
+│   ├── test_natural_response.py
+│   └── quick_validation.py
+│
+├── data/
+│   ├── kb/
+│   │   └── sop.json        # Standard Operating Procedures
+│   └── storage/
+│       ├── logs/           # Session & LLM logs
+│       ├── backups/        # Memory backups
+│       └── memory.json     # User memory & state
+│
+├── scripts/
+│   ├── clear_memory.py
+│   └── view_chat_logs.py
+│
+└── requirements.txt
+```
+
+## 🔧 Troubleshooting
+
+### Ollama Connection Error
+
+```bash
+# Pastikan Ollama berjalan
+curl http://localhost:11434/api/tags
+
+# Restart Ollama jika perlu
+pkill ollama
+ollama serve
+```
+
+### Model Not Found
+
+```bash
+# List model yang ada
+ollama list
+
+# Re-pull model jika perlu
+ollama pull qwen2.5:7b-instruct
+```
+
+### Port Already in Use
+
+```bash
+# Gunakan port lain
+uvicorn src.api:app --host 0.0.0.0 --port 9000 --reload
+
+# Atau kill process yang menggunakan port
+lsof -ti:8080 | xargs kill -9
+```
+
+### Memory Issues
+
+```bash
+# Clear memory dengan backup otomatis
+python scripts/clear_memory.py
+```
 
 ## 📝 API Endpoints
 
@@ -175,60 +262,66 @@ Main conversation endpoint
 
 Health check endpoint
 
-### POST `/feedback`
-
-User feedback submission
-
 ### POST `/summarize`
 
-Generate conversation summary using LLM
+Generate conversation summary
 
 ```json
 {
   "session_id": "string",
-  "messages": [optional array of message objects],
-  "use_local_logs": false,
-  "send_to_node": false
+  "use_local_logs": false
 }
 ```
 
-Returns:
+### POST `/admin/reset-memory`
+
+Reset user memory (backup otomatis)
 
 ```json
 {
-  "success": true,
-  "session_id": "string",
-  "summary": "formatted summary text",
-  "message_count": 10,
-  "metadata": {
-    "generated_at": "timestamp",
-    "source": "local_logs | node_server"
-  }
+  "user_id": "string"
 }
 ```
 
-### GET `/admin/logs`
+## 🛠️ Development Commands
 
-Retrieve recent session logs
+```bash
+# Aktifkan virtual environment
+source .venv/bin/activate
+
+# Install dependencies baru
+pip install <package-name>
+pip freeze > requirements.txt
+
+# View chat logs
+python scripts/view_chat_logs.py
+
+# Clear memory
+python scripts/clear_memory.py
+```
+
+## 📊 Features
+
+- **Intelligent Troubleshooting:** SOP-based automated troubleshooting flow
+- **Data Collection:** Natural conversation-based user data collection
+- **Memory Management:** Persistent user state dengan backup otomatis
+- **Session Logging:** Comprehensive logging untuk debugging
+- **RAG Integration:** Vector-based knowledge retrieval
+- **LLM-Powered:** Natural language understanding menggunakan Qwen2.5
+- **Spam Filter:** Deteksi spam dan irrelevant messages
+- **Intent Detection:** Smart intent detection untuk better UX
 
 ## 🗂️ Data Storage
 
-- **Memory:** `data/storage/memory.json` - User state and conversation history
-- **Logs:** `data/storage/logs/` - Session logs and LLM interactions
-- **Vector DB:** `data/storage/qdrant/` - Qdrant vector database
+- **Memory:** `data/storage/memory.json` - User state dan conversation history
+- **Logs:** `data/storage/logs/` - Session logs dan LLM interactions
+- **Backups:** `data/storage/backups/` - Memory backups otomatis
 - **Knowledge Base:** `data/kb/sop.json` - Troubleshooting SOPs
-
-## 🔄 Migration from Old Structure
-
-This project was recently restructured for better organization:
-
-- Old structure backup: `/Users/adrianalfajri/Projects/klar-rag-old-structure-*`
-- See `docs/RESTRUCTURE_STATUS.md` for details
 
 ## 📄 License
 
-Internal project - Honeywell Indonesia
+Internal project
 
 ## 👥 Maintainers
 
-- Development Team
+Development Team

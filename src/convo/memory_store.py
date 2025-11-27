@@ -25,6 +25,7 @@ class UserRecord:
         self.session_token: str = secrets.token_hex(8)
         self.name: Optional[str] = None
         self.gender: Optional[str] = None
+        self.is_company: Optional[bool] = None
         self.product: Optional[str] = None
         self.serial: Optional[str] = None
         self.address: Optional[str] = None
@@ -172,6 +173,27 @@ class MemoryStore:
         with self._get_user_lock(uid):
             if uid in self._records:
                 rec = self._records[uid]
+                
+                backup_dir = os.path.join(os.path.dirname(self.path), "backups")
+                os.makedirs(backup_dir, exist_ok=True)
+                
+                timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+                backup_filename = f"memory_backup_{uid}_{timestamp}.json"
+                backup_path = os.path.join(backup_dir, backup_filename)
+                
+                backup_data = {
+                    "user_id": uid,
+                    "backup_timestamp": _now_iso(),
+                    "record": rec.to_dict()
+                }
+                
+                try:
+                    with open(backup_path, "w", encoding="utf-8") as f:
+                        json.dump(backup_data, f, ensure_ascii=False, indent=2)
+                    print(f"✅ Backup saved: {backup_path}")
+                except Exception as e:
+                    print(f"❌ Backup failed: {e}")
+                
                 rec.regenerate_token()
                 del self._records[uid]
                 self._save()
