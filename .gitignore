@@ -91,3 +91,10 @@ backup_*/
 
 # Qdrant vector storage
 qdrant_storage/
+
+# Development files (ignore from GitHub)
+docs/
+scripts/
+tests/
+data/storage/logs/archive/
+
