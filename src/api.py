@@ -343,6 +343,60 @@ def admin_memory_stats(secret: str = Query(...)):
         print(f"[ERROR] admin_memory_stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/admin/spam-status")
+def admin_spam_status(user_id: str, secret: str = Query(...)):
+    ADMIN_SECRET = os.getenv("ADMIN_SECRET_KEY", "dev_reset_2024")
+    
+    if secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Invalid secret key")
+    
+    try:
+        spam_level = engine._get_spam_level(user_id)
+        block_status = engine._is_spam_blocked(user_id)
+        
+        spam_history = engine.memstore.get_flag(user_id, "spam_history") or []
+        spam_total = engine.memstore.get_flag(user_id, "spam_total") or 0
+        spam_user = engine.memstore.get_flag(user_id, "spam_user") or False
+        blocked_until = engine.memstore.get_flag(user_id, "spam_blocked_until")
+        
+        return {
+            "ok": True,
+            "user_id": user_id,
+            "spam_level": spam_level,
+            "block_status": block_status,
+            "details": {
+                "spam_history": spam_history,
+                "spam_total": spam_total,
+                "spam_user": spam_user,
+                "blocked_until": blocked_until
+            }
+        }
+    except Exception as e:
+        print(f"[ERROR] admin_spam_status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/admin/clear-spam")
+def admin_clear_spam(user_id: str, secret: str = Query(...)):
+    ADMIN_SECRET = os.getenv("ADMIN_SECRET_KEY", "dev_reset_2024")
+    
+    if secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Invalid secret key")
+    
+    try:
+        engine.memstore.clear_flag(user_id, "spam_history")
+        engine.memstore.clear_flag(user_id, "spam_total")
+        engine.memstore.clear_flag(user_id, "spam_user")
+        engine.memstore.clear_flag(user_id, "spam_blocked_until")
+        
+        return {
+            "ok": True,
+            "message": f"Spam flags cleared untuk user: {user_id}",
+            "user_id": user_id
+        }
+    except Exception as e:
+        print(f"[ERROR] admin_clear_spam: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # === Run manual ===
 # uvicorn src.api:app --host 0.0.0.0 --port 8080 --reload

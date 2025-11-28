@@ -500,8 +500,7 @@ class ConversationEngine:
         serial = identity.get("serial")
         gender = identity.get("gender")
 
-        # Hanya deteksi dan simpan jika early check mendeteksi ada identitas
-        if has_identity: # Fixed: Removed undefined 'early.get("has_identity")' and used 'has_identity'
+        if has_identity:
             detect_prompt = f"""
             Analisis pesan pelanggan berikut:
             "{message}"
@@ -1272,6 +1271,54 @@ class ConversationEngine:
             "is_spam": is_spam,
             "is_profanity": is_profanity
         }
+    
+    def _track_spam_event(self, user_id: str) -> None:
+        now = datetime.now(timezone.utc)
+        spam_history = self.memstore.get_flag(user_id, "spam_history") or []
+        
+        spam_history.append(now.isoformat())
+        
+        cutoff_5min = (now - timedelta(minutes=5)).isoformat()
+        spam_history = [ts for ts in spam_history if ts > cutoff_5min]
+        
+        self.memstore.set_flag(user_id, "spam_history", spam_history)
+        
+        total_spam = self.memstore.get_flag(user_id, "spam_total") or 0
+        self.memstore.set_flag(user_id, "spam_total", total_spam + 1)
+    
+    def _get_spam_level(self, user_id: str) -> dict:
+        spam_history = self.memstore.get_flag(user_id, "spam_history") or []
+        spam_total = self.memstore.get_flag(user_id, "spam_total") or 0
+        
+        recent_count = len(spam_history)
+        
+        if spam_total >= 10:
+            return {"level": "hard", "count": spam_total, "recent": recent_count}
+        elif recent_count >= 5:
+            return {"level": "medium", "count": spam_total, "recent": recent_count}
+        elif recent_count >= 3:
+            return {"level": "soft", "count": spam_total, "recent": recent_count}
+        else:
+            return {"level": "none", "count": spam_total, "recent": recent_count}
+    
+    def _is_spam_blocked(self, user_id: str) -> dict:
+        blocked_until = self.memstore.get_flag(user_id, "spam_blocked_until")
+        if not blocked_until:
+            return {"blocked": False}
+        
+        now = datetime.now(timezone.utc)
+        blocked_time = datetime.fromisoformat(blocked_until.replace('Z', '+00:00'))
+        
+        if now < blocked_time:
+            remaining = int((blocked_time - now).total_seconds() / 60)
+            return {
+                "blocked": True, 
+                "remaining_minutes": remaining,
+                "blocked_until": blocked_until
+            }
+        else:
+            self.memstore.clear_flag(user_id, "spam_blocked_until")
+            return {"blocked": False}
 
     def _parse_user_answer(self, message: str, expected_result: list) -> str:
         """Parse user answer dengan Python rule-based (TIDAK pakai LLM)"""
@@ -1581,12 +1628,9 @@ class ConversationEngine:
         
         reply = self.ollama.generate(system=system_msg, prompt=prompt).strip()
         
-        # Cleanup kutip jika masih ada
         reply = reply.replace('"', '').replace("'", '')
         
-        # Safety check: jika ada karakter non-latin (bahasa asing), gunakan template asli
         try:
-            # Cek apakah ada karakter CJK (Chinese, Japanese, Korean)
             cjk_pattern = r'[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]'
             import re
             if re.search(cjk_pattern, reply):
@@ -2264,6 +2308,19 @@ class ConversationEngine:
             }
         )
         
+        
+        block_status = self._is_spam_blocked(user_id)
+        if block_status["blocked"]:
+            remaining = block_status["remaining_minutes"]
+            short_log(self.logger, user_id, "spam_blocked", f"Blocked for {remaining}min")
+            return self._log_and_return(user_id, {
+                "bubbles": [{
+                    "text": f"Maaf kak, mohon tunggu {remaining} menit lagi ya 🙏"
+                }], 
+                "next": "end",
+                "status": "blocked"
+            }, {"context": "spam_blocked", "remaining_minutes": remaining})
+        
         spam_check = self._check_spam_or_profanity(user_id, msg)
         if spam_check["is_spam"] or spam_check["is_profanity"]:
             spam_type = "profanity" if spam_check["is_profanity"] else "spam"
@@ -2275,23 +2332,50 @@ class ConversationEngine:
                     "next": "await_reply"
                 }, {"context": "profanity_filtered"})
             
-            spam_count = self.memstore.get_flag(user_id, "spam_count") or 0
-            spam_count += 1
-            self.memstore.set_flag(user_id, "spam_count", spam_count)
+            self._track_spam_event(user_id)
+            spam_level = self._get_spam_level(user_id)
             
-            if spam_count >= 3:
-                self.memstore.set_flag(user_id, "spam_count", 0)
+            short_log(self.logger, user_id, "spam_level", 
+                     f"Level: {spam_level['level']}, Recent: {spam_level['recent']}, Total: {spam_level['count']}")
+            
+            if spam_level["level"] == "hard":
+                self.memstore.set_flag(user_id, "spam_user", True)
+                short_log(self.logger, user_id, "spam_hard_limit", "User flagged as spam_user")
                 return self._log_and_return(user_id, {
-                    "bubbles": [{"text": "Kak, kalau ada keluhan EAC bisa langsung ceritakan ya 😊"}], 
-                    "next": "await_reply"
-                }, {"context": "spam_threshold_reached"})
+                    "bubbles": [{
+                        "text": "Kak, untuk bantuan lebih lanjut silakan hubungi customer service kami ya 🙏"
+                    }], 
+                    "next": "end",
+                    "status": "spam_blocked"
+                }, {"context": "spam_hard_limit"})
             
-            return self._log_and_return(user_id, {
-                "bubbles": [{"text": "🙏"}], 
-                "next": "await_reply"
-            }, {"context": "spam_filtered"})
-        
-        self.memstore.set_flag(user_id, "spam_count", 0)
+            elif spam_level["level"] == "medium":
+                now = datetime.now(timezone.utc)
+                block_until = (now + timedelta(hours=1)).isoformat()
+                self.memstore.set_flag(user_id, "spam_blocked_until", block_until)
+                
+                short_log(self.logger, user_id, "spam_medium_limit", "User blocked for 1 hour")
+                return self._log_and_return(user_id, {
+                    "bubbles": [{
+                        "text": "Kak, terlalu banyak pesan dalam waktu singkat. Mohon tunggu 1 jam ya 🙏"
+                    }], 
+                    "next": "end",
+                    "status": "blocked"
+                }, {"context": "spam_medium_limit", "block_duration_hours": 1})
+            
+            elif spam_level["level"] == "soft":
+                return self._log_and_return(user_id, {
+                    "bubbles": [{
+                        "text": "Kak, kalau ada keluhan EAC bisa langsung ceritakan ya 😊"
+                    }], 
+                    "next": "await_reply"
+                }, {"context": "spam_soft_limit"})
+            
+            else:
+                return self._log_and_return(user_id, {
+                    "bubbles": [{"text": "🙏"}], 
+                    "next": "await_reply"
+                }, {"context": "spam_filtered"})
         
         sop_resolved_flag = self.memstore.get_flag(user_id, "sop_resolved")
         if sop_resolved_flag:
@@ -2322,12 +2406,6 @@ class ConversationEngine:
         active_intent = self.memstore.get_flag(user_id, "active_intent")
         sop_pending_for_check = self.memstore.get_flag(user_id, "sop_pending")
         
-        if active_intent and not sop_pending_for_check:
-            data_detected = self._detect_and_store_identity(user_id, msg)
-            if data_detected:
-                short_log(self.logger, user_id, "data_collected_mid_flow", 
-                         f"Type: {data_detected['type']}, Value: {data_detected['value']}")
-
         unified = self.detect_intent_via_llm(user_id, msg, sop_intents)
 
         category      = unified["category"]
@@ -2369,16 +2447,13 @@ class ConversationEngine:
             
             is_answering_troubleshoot = False
             if active_step and step_def:
-                # Check if bot just asked a question
                 history = self.memstore.get_history(user_id)
                 if len(history) >= 2:
                     last_msg = history[-1]
                     second_last = history[-2]
                     if last_msg.get("role") == "user" and second_last.get("role") == "bot":
-                        # Bot just asked, user just answered - this is troubleshooting answer
                         is_answering_troubleshoot = True
             
-            # Only check distraction if NOT answering troubleshooting
             if not is_answering_troubleshoot:
                 distraction_type = self._classify_distraction_type(msg)
                 
@@ -2517,7 +2592,6 @@ class ConversationEngine:
                     self.memstore.append_history(user_id, "bot", combined_response)
                     return self._log_and_return(user_id, {"bubbles": [{"text": combined_response}], "next": "await_reply", "status": "in_progress"}, {"context": "chitchat_distraction_handled"})
             
-            # Fallback if no active intent or step_def
             return self._log_and_return(user_id, {
                 "bubbles": [{
                     "text": self._generate_natural_fallback(user_id, msg, "chitchat_no_intent")
@@ -2554,54 +2628,42 @@ class ConversationEngine:
                 
                 return self._log_and_return(user_id, {"bubbles": [{"text": name_question}], "next": "await_reply", "status": "open"}, {"context": "pending_just_triggered"})
             
-            # Detect new session vs follow-up
             session_detection = self._detect_new_session_or_followup(user_id, msg, active_intent, sop_pending_flag)
             session_type = session_detection.get("type", "follow_up")
             
             short_log(self.logger, user_id, "session_detection", 
                      f"Type: {session_type}, Reason: {session_detection.get('reason', '')}")
             
-            # Handle new session - reset state
             if session_type == "new_session":
                 short_log(self.logger, user_id, "conversation_reset", 
                          "New session detected, resetting pending state")
                 
-                # Clear pending state tapi simpan history
                 self.memstore.clear_flag(user_id, "sop_pending")
                 self.memstore.clear_flag(user_id, "active_intent")
                 
-                # Reply greeting dan proses ulang message
                 if has_greeting:
                     greeting_reply = self.handle_greeting(user_id, greeting_part, {"should_reply_greeting": True})
                     self.memstore.append_history(user_id, "bot", greeting_reply)
                     
-                    # Jika cuma greeting aja, return
                     if issue_part.strip() == "":
                         return self._log_and_return(user_id, {"bubbles": [{"text": greeting_reply}], "next": "await_reply"}, {"context": "new_session_greeting_only"})
                     
-                    # Ada issue, lanjutkan proses normal
-                    # Re-detect intent untuk message baru
                     return self._log_and_return(user_id, {"bubbles": [{"text": greeting_reply}], "next": "await_reply"}, {"context": "new_session_with_issue"})
                 
-                # No greeting, just reset and continue
                 return self._log_and_return(user_id, {"bubbles": [{"text": "Baik Kak, ada yang bisa saya bantu?"}], "next": "await_reply"}, {"context": "new_session_reset"})
             
-            # Handle new complaint - queue it
             if session_type == "new_complaint":
                 short_log(self.logger, user_id, "new_complaint_while_pending", 
                          f"New complaint detected while pending")
                 
-                # Acknowledge dan queue
                 ack_msg = "Baik Kak, keluhan baru akan kami catat. Untuk saat ini data collection masih berjalan untuk keluhan sebelumnya."
                 self.memstore.append_history(user_id, "bot", ack_msg)
                 
-                # Queue the new complaint
                 if sop_intent != "none":
                     self._queue_additional_complaint(user_id, sop_intent)
                 
                 return self._log_and_return(user_id, {"bubbles": [{"text": ack_msg}], "next": "await_reply", "status": "open"}, {"context": "new_complaint_queued"})
             
-            # Follow-up - continue with data collection
             if active_intent and active_intent != "none":
                 python_additional = self._detect_additional_complaint_python(msg, active_intent)
                 if python_additional != "none":
@@ -2704,47 +2766,7 @@ class ConversationEngine:
         self.memstore.append_history(user_id, "bot", fallback)
         return self._log_and_return(user_id, {"bubbles": [{"text": fallback}], "next": "await_reply"}, {"context": "no_intent_detected"})
 
-    def _detect_and_store_identity(self, user_id: str, message: str) -> Optional[Dict[str, str]]:
-        prompt = f"""
-        Analisis pesan berikut dan deteksi apakah ada informasi identitas:
-        "{message}"
-        
-        Informasi yang dicari:
-        - nama (misal: "Nama saya Budi", "Saya Budi")
-        - alamat (misal: "Alamat saya di Jakarta", "Saya di Bandung")
-        - produk (misal: "Produk EAC", "Alat EAC")
-        - serial (misal: "Nomor serial f57a", "Serial: ABC123")
-        
-        Jawab HANYA JSON:
-        {{
-          "has_identity": true/false,
-          "type": "nama/alamat/produk/serial/none",
-          "value": "<isi yang terdeteksi atau kosong>"
-        }}
-        """
-        
-        system_msg = "Detektor identitas pelanggan. Jawab HANYA JSON valid."
-        out = self.ollama.generate_json(system=system_msg, prompt=prompt) or {}
-        
-        if not out.get("has_identity"):
-            return None
-        
-        dtype = out.get("type", "none")
-        value = (out.get("value") or "").strip()
-        
-        if not value or dtype == "none":
-            return None
-        
-        if dtype == "nama":
-            self.memstore.set_name(user_id, value)
-        elif dtype == "alamat":
-            self.memstore.update(user_id, {"address": value})
-        elif dtype == "produk":
-            self.memstore.set_product(user_id, value)
-        elif dtype == "serial":
-            self.memstore.update(user_id, {"serial": value})
-        
-        return {"type": dtype, "value": value}
+
 
 
 if __name__ == "__main__":
