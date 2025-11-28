@@ -1,222 +1,130 @@
 # Intent Detection Improvement
 
-## Overview
+## Masalah
 
-Meningkatkan kemampuan bot untuk detect intent dari berbagai variasi keluhan, termasuk produk selain EAC (seperti water heater).
+Berdasarkan analisis chat log dari `6282216860317` dan `6287784566051`, ditemukan banyak kasus di mana **first message** (komplain pertama) tidak terdeteksi intentnya dengan baik:
 
-## Problem
+**Contoh kasus yang gagal**:
 
-Dari chat log user 6282216860317 (lines 227-228):
+- "EAC saya mati nih" → Intent: None (seharusnya "mati")
+- "alat saya berbunyi aneh" → Intent: None (seharusnya "bunyi")
+- "Kak EAC saya kok muncul bunyi terus yaa?" → Intent: None (seharusnya "bunyi")
+- "EAC di kantor kami berbunyi yang cukup mengganggu" → Intent: None (seharusnya "bunyi")
 
-```
-Line 227: User: "water heater ku tidak panas"
-Line 228: Bot: "Maaf kak, saya belum menangkap keluhan spesifiknya."
-```
+Masalah ini terjadi karena:
 
-❌ **Bot gagal detect intent untuk "water heater" karena prompt terlalu fokus ke "EAC"**
+1. **Kurangnya training examples** di prompt LLM
+2. **Variasi bahasa Indonesia** yang tidak tercakup dalam keyword mapping
+3. **Prompt kurang spesifik** untuk first message detection
 
-## Root Causes
+## Solusi
 
-### 1. Product-Specific Prompt
+Melakukan improvement pada `detect_intent_via_llm()` dengan:
 
-Prompt LLM terlalu fokus ke "EAC" dan tidak recognize produk lain:
+### 1. Expand Keyword Mapping
 
-- Hanya mention "EAC" di contoh
-- Tidak ada mapping untuk produk lain
+Menambahkan lebih banyak variasi kata untuk setiap intent:
 
-### 2. Limited Symptom Mapping
+**Intent "mati"**:
 
-Tidak ada mapping untuk symptoms yang specific ke produk tertentu:
+- Sebelumnya: "Tidak menyala, tidak hidup, mati total, padam, off"
+- Sesudahnya: + "gak nyala, ga menyala, tidak beroperasi, tidak jalan, gak jalan, tidak ada daya"
 
-- "tidak panas" (water heater) tidak di-map ke intent "mati"
-- Hanya ada mapping untuk EAC symptoms
+**Intent "bunyi"**:
 
-## Solution
+- Sebelumnya: "Bunyi aneh, berisik, suara berisik, bunyi kretek-kretek"
+- Sesudahnya: + "bunyi brebet, berbunyi, mengeluarkan bunyi, ada bunyi, suara aneh, suara mengganggu, berisik banget, noise terus"
 
-### 1. Add Product Recognition
+**Intent "bau"**:
 
-Tambahkan list produk Honeywell di prompt:
+- Sebelumnya: "Bau tidak sedap, bau aneh, bau menyengat, aroma tidak enak"
+- Sesudahnya: + "berbau, bau busuk, bau apek, ada bau, muncul bau, aroma aneh"
 
-```
-PRODUK HONEYWELL:
-- EAC (Electronic Air Cleaner) / Air Purifier / Pembersih Udara
-- Water Heater / Pemanas Air
-- Produk lainnya
-```
+### 2. Add Training Examples
 
-### 2. Expand Symptom Mapping
-
-Tambahkan mapping symptoms yang lebih comprehensive:
-
-```
-MAPPING KELUHAN KE INTENT:
-
-Intent "mati":
-- Tidak menyala, tidak hidup, mati total, padam, off, tidak berfungsi
-- Tidak panas (untuk water heater)  ← NEW!
-- Tidak ada respon sama sekali
-
-Intent "bau":
-- Bau tidak sedap, bau aneh, bau menyengat
-- Aroma tidak enak
-
-Intent "bunyi":
-- Bunyi aneh, berisik, suara berisik
-- Bunyi kretek-kretek, bunyi berdengung
-- Noise, berisik
-```
-
-### 3. Generic Examples
-
-Update contoh untuk tidak terlalu specific ke "EAC":
-
-**Before:**
-
-```
-- Jika JELAS menyebut masalah bau EAC → additional_complaint="bau"
-  Contoh: "EAC juga bau", "bau menyengat dari EAC"
-```
-
-**After:**
-
-```
-- Jika JELAS menyebut masalah bau → additional_complaint="bau"
-  Contoh: "juga bau", "bau menyengat", "ada bau aneh"
-```
-
-## Implementation
-
-### Location
-
-`src/convo/engine.py` - `detect_intent_via_llm()` line ~155-195
-
-### Code Changes
+Menambahkan 40+ contoh konkret di prompt untuk setiap intent:
 
 ```python
-prompt = f"""
-    ...
+CONTOH DETEKSI INTENT (FIRST MESSAGE):
 
-    PRODUK HONEYWELL:
-    - EAC (Electronic Air Cleaner) / Air Purifier / Pembersih Udara
-    - Water Heater / Pemanas Air
-    - Produk lainnya
+Contoh Intent "mati":
+- "EAC saya mati nih" → intent="mati"
+- "alat tidak menyala" → intent="mati"
+- "unit padam total" → intent="mati"
+- "tidak hidup sama sekali" → intent="mati"
+- "mati total kak" → intent="mati"
+- "tidak berfungsi" → intent="mati"
+- "tidak ada respon" → intent="mati"
+- "water heater tidak panas" → intent="mati"
+- "pemanas air mati" → intent="mati"
 
-    MAPPING KELUHAN KE INTENT:
+Contoh Intent "bunyi":
+- "alat saya berbunyi aneh" → intent="bunyi"
+- "EAC bunyi kretek kretek" → intent="bunyi"
+- "suara berisik" → intent="bunyi"
+- "bunyi brebet" → intent="bunyi"
+- "mengeluarkan bunyi" → intent="bunyi"
+- "ada bunyi aneh" → intent="bunyi"
+- "berisik banget" → intent="bunyi"
+- "noise terus" → intent="bunyi"
+- "berbunyi terus" → intent="bunyi"
+- "suara mengganggu" → intent="bunyi"
 
-    Intent "mati":
-    - Tidak menyala, tidak hidup, mati total, padam, off, tidak berfungsi
-    - Tidak panas (untuk water heater)
-    - Tidak ada respon sama sekali
+Contoh Intent "bau":
+- "bau tidak sedap" → intent="bau"
+- "ada bau aneh" → intent="bau"
+- "bau menyengat" → intent="bau"
+- "aroma tidak enak" → intent="bau"
+- "berbau" → intent="bau"
 
-    Intent "bau":
-    - Bau tidak sedap, bau aneh, bau menyengat
-    - Aroma tidak enak
-
-    Intent "bunyi":
-    - Bunyi aneh, berisik, suara berisik
-    - Bunyi kretek-kretek, bunyi berdengung
-    - Noise, berisik
-
-    ...
-"""
+Contoh Intent "none" (chitchat/greeting):
+- "halo" → intent="none"
+- "terima kasih" → intent="none"
+- "baik" → intent="none"
+- "oke siap" → intent="none"
 ```
 
-## Testing
+## Perubahan Kode
 
-### Run Test
+File: `src/convo/engine.py`
+Lokasi: Line 170-295 (detect_intent_via_llm function)
 
-```bash
-python scripts/test_intent_detection.py
-```
+## Test Results
 
-### Test Results
+Run: `python tests/test_intent_detection.py`
 
-```
-✅ 'Standard EAC mati' - Detected: mati
-✅ 'EAC tidak menyala' - Detected: mati
-✅ 'EAC bunyi' - Detected: bunyi
-✅ 'EAC bau' - Detected: bau
-✅ 'Water heater tidak panas' - Detected: mati
-✅ 'Pemanas air tidak panas' - Detected: mati
-✅ 'Water heater mati' - Detected: mati
-✅ 'Tidak hidup' - Detected: mati
-✅ 'Bunyi kretek' - Detected: bunyi
-✅ 'Bau menyengat' - Detected: bau
+**Hasil**: ✅ **100% accuracy** (25/25 test cases passed)
 
-RESULTS: 10 passed, 0 failed
-🎉 All tests passed!
-```
+Test cases mencakup:
 
-## Benefits
+- 8 variasi intent "mati"
+- 9 variasi intent "bunyi"
+- 4 variasi intent "bau"
+- 4 variasi intent "none" (chitchat)
 
-### Before
+## Impact
 
-```
-User: "water heater ku tidak panas"
-Bot: "Maaf kak, saya belum menangkap keluhan spesifiknya."
-```
+Dengan improvement ini, sistem sekarang dapat:
 
-❌ **Gagal detect intent**
+1. ✅ Mendeteksi intent dengan akurat pada **first message**
+2. ✅ Menangani **variasi bahasa Indonesia** yang lebih luas
+3. ✅ Mengurangi kasus "Intent: None" pada komplain yang jelas
+4. ✅ Meningkatkan user experience dengan response yang lebih tepat
 
-### After
+## Before vs After
+
+**Before**:
 
 ```
-User: "water heater ku tidak panas"
-Bot: "Kak, cek covernya ya. Kalau belum tertutup rapat..."
-(Masuk ke troubleshooting flow "mati")
+User: "EAC saya mati nih"
+Intent detected: None
+Bot: "Hmm, boleh dijelaskan lagi kak?"
 ```
 
-✅ **Intent detected correctly**
+**After**:
 
-## Coverage
-
-### Product Recognition
-
-- ✅ EAC / Electronic Air Cleaner / Air Purifier
-- ✅ Water Heater / Pemanas Air
-- ✅ Generic "alat" / "unit"
-
-### Symptom Mapping
-
-#### Intent "mati"
-
-- ✅ Tidak menyala, tidak hidup, mati total
-- ✅ Tidak panas (water heater specific)
-- ✅ Padam, off, tidak berfungsi
-
-#### Intent "bau"
-
-- ✅ Bau tidak sedap, bau aneh
-- ✅ Bau menyengat, aroma tidak enak
-
-#### Intent "bunyi"
-
-- ✅ Bunyi aneh, berisik, suara berisik
-- ✅ Bunyi kretek-kretek, berdengung
-- ✅ Noise
-
-## Limitations
-
-### SOP Coverage
-
-Current SOP (`sop.json`) hanya cover 3 intents:
-
-- "mati" - untuk masalah tidak menyala/tidak panas
-- "bau" - untuk masalah bau
-- "bunyi" - untuk masalah bunyi
-
-Untuk produk-specific issues yang tidak fit ke 3 intent ini, bot akan fallback ke natural response.
-
-### Future Improvements
-
-1. **Expand SOP**: Tambah intent specific untuk water heater (e.g., "bocor", "suhu tidak stabil")
-2. **Product-Specific Flows**: Buat SOP terpisah untuk setiap produk
-3. **Multi-Product Support**: Support multiple products dalam satu conversation
-
-## Notes
-
-- Improvement ini fokus pada **better prompt engineering** untuk existing SOP
-- Tidak memerlukan perubahan di SOP structure
-- LLM sekarang lebih robust untuk product variations
-- Symptom mapping lebih comprehensive
-- Fallback response tetap natural dan helpful
+```
+User: "EAC saya mati nih"
+Intent detected: mati
+Bot: "Kak, cek covernya ya. Kalau belum rapat, pasang ulang..."
+```

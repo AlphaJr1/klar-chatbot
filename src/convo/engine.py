@@ -174,15 +174,23 @@ class ConversationEngine:
         - Tidak menyala, tidak hidup, mati total, padam, off, tidak berfungsi
         - Tidak panas (untuk water heater)
         - Tidak ada respon sama sekali
+        - Mati, tidak nyala, gak nyala, ga menyala
+        - Tidak beroperasi, tidak jalan, gak jalan
+        - Tidak ada daya, tidak ada listrik
         
         Intent "bau":
         - Bau tidak sedap, bau aneh, bau menyengat
-        - Aroma tidak enak
+        - Aroma tidak enak, aroma aneh
+        - Berbau, bau busuk, bau apek
+        - Ada bau, muncul bau
         
         Intent "bunyi":
         - Bunyi aneh, berisik, suara berisik
-        - Bunyi kretek-kretek, bunyi berdengung
-        - Noise, berisik
+        - Bunyi kretek-kretek, bunyi berdengung, bunyi brebet
+        - Noise, berisik, ribut
+        - Berbunyi, mengeluarkan bunyi, ada bunyi
+        - Suara aneh, suara mengganggu, suara berisik
+        - Berisik banget, noise terus
 
         LOGIC PRIORITAS:
         
@@ -254,6 +262,45 @@ class ConversationEngine:
         "is_new_complaint": true/false,
         "additional_complaint": "<mati/bau/bunyi/none>"
         }}
+        
+        CONTOH DETEKSI INTENT (FIRST MESSAGE):
+        
+        Contoh Intent "mati":
+        - "EAC saya mati nih" → intent="mati"
+        - "alat tidak menyala" → intent="mati"
+        - "unit padam total" → intent="mati"
+        - "tidak hidup sama sekali" → intent="mati"
+        - "mati total kak" → intent="mati"
+        - "tidak berfungsi" → intent="mati"
+        - "tidak ada respon" → intent="mati"
+        - "water heater tidak panas" → intent="mati"
+        - "pemanas air mati" → intent="mati"
+        
+        Contoh Intent "bunyi":
+        - "alat saya berbunyi aneh" → intent="bunyi"
+        - "EAC bunyi kretek kretek" → intent="bunyi"
+        - "suara berisik" → intent="bunyi"
+        - "bunyi brebet" → intent="bunyi"
+        - "mengeluarkan bunyi" → intent="bunyi"
+        - "ada bunyi aneh" → intent="bunyi"
+        - "berisik banget" → intent="bunyi"
+        - "noise terus" → intent="bunyi"
+        - "berbunyi terus" → intent="bunyi"
+        - "suara mengganggu" → intent="bunyi"
+        
+        Contoh Intent "bau":
+        - "bau tidak sedap" → intent="bau"
+        - "ada bau aneh" → intent="bau"
+        - "bau menyengat" → intent="bau"
+        - "aroma tidak enak" → intent="bau"
+        - "berbau" → intent="bau"
+        
+        Contoh Intent "none" (chitchat/greeting):
+        - "halo" → intent="none"
+        - "terima kasih" → intent="none"
+        - "baik" → intent="none"
+        - "oke siap" → intent="none"
+        - "gimana caranya?" → intent="none" (pertanyaan umum tanpa keluhan)
         """
 
         out = self.ollama.generate_json(system=system_msg, prompt=prompt) or {}
@@ -283,6 +330,67 @@ class ConversationEngine:
         if active_intent and out.get("intent") in ("none", None):
             out["intent"] = active_intent
 
+        return out
+
+    def _detect_new_session_or_followup(self, user_id: str, message: str, active_intent: str, sop_pending: bool) -> Dict[str, Any]:
+        history = self.memstore.get_history(user_id)
+        recent_history = history[-5:] if len(history) >= 5 else history
+        history_text = "\n".join([f"{h['role']}: {h['text']}" for h in recent_history])
+        
+        system_msg = "Kamu adalah conversation analyzer. Jawab HANYA JSON VALID."
+        
+        prompt = f"""
+        User sedang dalam status pending (sudah dijadwalkan teknisi).
+        Active intent: {active_intent or "none"}
+        
+        Riwayat percakapan terakhir:
+        {history_text}
+        
+        Pesan user sekarang:
+        "{message}"
+        
+        Analisis dan kategorikan:
+        
+        1. "new_session" - User memulai conversation baru
+           - Hanya greeting tanpa keluhan: "Halo", "Siang"
+           - Greeting + pertanyaan umum bukan terkait pending
+           
+        2. "follow_up" - Follow-up terkait masalah yang SAMA
+           - Tanya progress: "Kapan teknisi datang?"
+           - Konfirmasi: "Oke siap", "Baik terima kasih"
+           - Mention masalah yang sama
+           
+        3. "new_complaint" - Komplain masalah BARU
+           - Mention masalah baru berbeda
+           - Keluhan berbeda dari active_intent
+        
+        CONTOH:
+        Active: "bunyi", Message: "Halo" → type="new_session"
+        Active: "bunyi", Message: "Kapan teknisi datang?" → type="follow_up"
+        Active: "bunyi", Message: "Sekarang ada bau" → type="new_complaint"
+        
+        JSON:
+        {{
+          "type": "new_session/follow_up/new_complaint",
+          "reason": "<penjelasan>"
+        }}
+        """
+        
+        out = self.ollama.generate_json(system=system_msg, prompt=prompt) or {}
+        
+        self._log_llm_call(
+            func="_detect_new_session_or_followup",
+            user_id=user_id,
+            call_type="generate_json",
+            system=system_msg,
+            prompt=prompt,
+            response=out,
+            meta={"active_intent": active_intent, "sop_pending": sop_pending},
+        )
+        
+        out.setdefault("type", "follow_up")
+        out.setdefault("reason", "")
+        
         return out
 
     def handle_greeting(self, user_id: str, message: str, extracted: Dict[str, Any]) -> Optional[str]:
@@ -1880,6 +1988,15 @@ class ConversationEngine:
             
             if user_answer_confirm == 'yes':
                 if confirm_data.get("resolve_if_yes"):
+                    if not self._is_explicit_resolution(message):
+                        short_log(self.logger, user_id, "prevent_premature_resolve_confirm", 
+                                 f"User jawab yes tapi tidak ada konfirmasi eksplisit")
+                        
+                        clarify_msg = "Jadi alatnya sudah berfungsi normal kak?"
+                        self.memstore.append_history(user_id, "bot", clarify_msg)
+                        
+                        return {"bubbles": [{"text": clarify_msg}], "next": "await_reply"}
+                    
                     resolve_list = step_def.get("resolve_templates", [])
                     resolve_template = random.choice(resolve_list) if resolve_list else "Baik kak, saya tutup laporannya ya."
                     resolve_msg = self._naturalize_template(user_id, resolve_template, "resolve")
@@ -2437,6 +2554,54 @@ class ConversationEngine:
                 
                 return self._log_and_return(user_id, {"bubbles": [{"text": name_question}], "next": "await_reply", "status": "open"}, {"context": "pending_just_triggered"})
             
+            # Detect new session vs follow-up
+            session_detection = self._detect_new_session_or_followup(user_id, msg, active_intent, sop_pending_flag)
+            session_type = session_detection.get("type", "follow_up")
+            
+            short_log(self.logger, user_id, "session_detection", 
+                     f"Type: {session_type}, Reason: {session_detection.get('reason', '')}")
+            
+            # Handle new session - reset state
+            if session_type == "new_session":
+                short_log(self.logger, user_id, "conversation_reset", 
+                         "New session detected, resetting pending state")
+                
+                # Clear pending state tapi simpan history
+                self.memstore.clear_flag(user_id, "sop_pending")
+                self.memstore.clear_flag(user_id, "active_intent")
+                
+                # Reply greeting dan proses ulang message
+                if has_greeting:
+                    greeting_reply = self.handle_greeting(user_id, greeting_part, {"should_reply_greeting": True})
+                    self.memstore.append_history(user_id, "bot", greeting_reply)
+                    
+                    # Jika cuma greeting aja, return
+                    if issue_part.strip() == "":
+                        return self._log_and_return(user_id, {"bubbles": [{"text": greeting_reply}], "next": "await_reply"}, {"context": "new_session_greeting_only"})
+                    
+                    # Ada issue, lanjutkan proses normal
+                    # Re-detect intent untuk message baru
+                    return self._log_and_return(user_id, {"bubbles": [{"text": greeting_reply}], "next": "await_reply"}, {"context": "new_session_with_issue"})
+                
+                # No greeting, just reset and continue
+                return self._log_and_return(user_id, {"bubbles": [{"text": "Baik Kak, ada yang bisa saya bantu?"}], "next": "await_reply"}, {"context": "new_session_reset"})
+            
+            # Handle new complaint - queue it
+            if session_type == "new_complaint":
+                short_log(self.logger, user_id, "new_complaint_while_pending", 
+                         f"New complaint detected while pending")
+                
+                # Acknowledge dan queue
+                ack_msg = "Baik Kak, keluhan baru akan kami catat. Untuk saat ini data collection masih berjalan untuk keluhan sebelumnya."
+                self.memstore.append_history(user_id, "bot", ack_msg)
+                
+                # Queue the new complaint
+                if sop_intent != "none":
+                    self._queue_additional_complaint(user_id, sop_intent)
+                
+                return self._log_and_return(user_id, {"bubbles": [{"text": ack_msg}], "next": "await_reply", "status": "open"}, {"context": "new_complaint_queued"})
+            
+            # Follow-up - continue with data collection
             if active_intent and active_intent != "none":
                 python_additional = self._detect_additional_complaint_python(msg, active_intent)
                 if python_additional != "none":
@@ -2482,6 +2647,20 @@ class ConversationEngine:
                     identity = self.memstore.get_identity(user_id)
                     gender = identity.get("gender")
                     salutation = "Pak" if gender == "male" else "Bu" if gender == "female" else "Kak"
+                    
+                    if message_type == "chitchat":
+                        acknowledge_responses = [
+                            f"Baik {salutation}.",
+                            f"Oke {salutation}.",
+                            f"Siap {salutation}."
+                        ]
+                        ack_msg = random.choice(acknowledge_responses)
+                        
+                        short_log(self.logger, user_id, "pending_chitchat_acknowledge", 
+                                 f"User chitchat saat pending, hanya acknowledge")
+                        
+                        self.memstore.append_history(user_id, "bot", ack_msg)
+                        return self._log_and_return(user_id, {"bubbles": [{"text": ack_msg}], "next": "await_reply", "status": "open"}, {"context": "pending_chitchat_acknowledge"})
                     
                     field_map = {"name": "nama", "product": "produk", "address": "alamat"}
                     field_name = field_map.get(missing_field, "data")
