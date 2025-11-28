@@ -69,10 +69,12 @@ yarn-error.log*
 data/storage/memory.json
 data/storage/logs/*.jsonl
 data/storage/logs/llm_log.json
+data/storage/logs/archive/
 data/storage/qdrant/
 data/storage/conversations.json
 data/storage/backups/*
 !data/storage/backups/.gitkeep
+src/convo/llm_log/
 
 # Agent temporary files
 .agent/analysis/
