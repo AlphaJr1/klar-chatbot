@@ -397,6 +397,47 @@ def admin_clear_spam(user_id: str, secret: str = Query(...)):
         print(f"[ERROR] admin_clear_spam: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/admin/reset-conversations")
+def admin_reset_conversations(secret: str = Query(...)):
+    ADMIN_SECRET = os.getenv("ADMIN_SECRET_KEY", "dev_reset_2024")
+    
+    if secret != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Invalid secret key")
+    
+    try:
+        conversations_path = "data/storage/conversations.json"
+        backup_dir = "data/storage/backups"
+        
+        os.makedirs(backup_dir, exist_ok=True)
+        
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_path = os.path.join(backup_dir, f"conversations_{timestamp}.json")
+        
+        if os.path.exists(conversations_path):
+            with open(conversations_path, "r", encoding="utf-8") as src:
+                data = json.load(src)
+                conversation_count = len(data) if isinstance(data, list) else 0
+            
+            with open(backup_path, "w", encoding="utf-8") as dst:
+                json.dump(data, dst, ensure_ascii=False, indent=2)
+        else:
+            conversation_count = 0
+        
+        with open(conversations_path, "w", encoding="utf-8") as f:
+            json.dump([], f)
+        
+        print(f"[ADMIN] Reset conversations.json: {conversation_count} conversations backed up to {backup_path}")
+        
+        return {
+            "ok": True,
+            "message": f"Conversations direset. {conversation_count} conversations dibackup.",
+            "backup_path": backup_path,
+            "conversation_count": conversation_count
+        }
+    except Exception as e:
+        print(f"[ERROR] admin_reset_conversations: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # === Run manual ===
 # uvicorn src.api:app --host 0.0.0.0 --port 8080 --reload
