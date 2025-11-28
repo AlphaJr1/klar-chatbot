@@ -44,9 +44,9 @@
         "type": "binary",
         "description": "Penutup tidak rapat dapat membuat alat tidak menyala.",
         "ask_templates": [
-          "Sepertinya penutup unit belum terpasang rapat. Mohon matikan listrik unit, pastikan cover terpasang dengan rapat, lalu nyalakan kembali. Jika sudah rapat biasanya unit langsung menyala normal. Kalau masih bermasalah, silakan hubungi kami kembali ya kak.",
-          "Coba cek cover nya ya kak. Kalau belum tertutup rapat, bisa dicoba untuk pasang ulang sampai rapat, lalu nyalakan lagi. biasanya langsung normal. Silakan hubungi kami kembali kalo masi bermasalah ya kak.",
-          "Unit tidak menyala biasanya sering disebabkan karena covernya tidak rapat. Coba matikan dulu, pastikan cover tertutup dengan rapat, lalu nyalakan lagi. Mohon infokan ke kami ya kalau sudah menyala."
+          "Sepertinya penutup unit belum terpasang rapat. Mohon matikan listrik unit, pastikan cover terpasang dengan rapat, lalu nyalakan kembali. Jika sudah rapat biasanya unit langsung menyala normal. Kalau masih bermasalah, kami akan bantu jadwalkan teknisi ya kak.",
+          "Coba cek cover nya ya kak. Kalau belum tertutup rapat, bisa dicoba untuk pasang ulang sampai rapat, lalu nyalakan lagi. biasanya langsung normal. Kalau masih bermasalah, kami akan bantu jadwalkan teknisi ya kak.",
+          "Unit tidak menyala biasanya sering disebabkan karena covernya tidak rapat. Coba matikan dulu, pastikan cover tertutup dengan rapat, lalu nyalakan lagi. Kami tunggu konfirmasinya ya kalau sudah menyala kak."
         ],
         "instruct_templates": [
           "Silakan dirapatkan dulu penutup alatnya ya kak.",
@@ -86,8 +86,8 @@
         "type": "binary",
         "description": "Mode LOW adalah mode paling dasar.",
         "ask_templates": [
-          "Silakan tekan tombol Low Mode di remote untuk menghidupkan. Jika lampu indikator kuning menyala, unit sudah normal. Mohon info kembali jika masih berkendala ya kak",
-          "Coba tekan LOW di remote. Bila indikator kuning menyala dan hembusan terasa, berarti perangkat sudah berjalan normal. Kalau masih ada kendala silakan chat lagi ya kak",
+          "Silakan tekan tombol Low Mode di remote untuk menghidupkan. Jika lampu indikator kuning menyala, unit sudah normal. Kalau masih berkendala kami akan bantu jadwalkan teknisi ya kak",
+          "Coba tekan LOW di remote. Bila indikator kuning menyala dan hembusan terasa, berarti perangkat sudah berjalan normal. Kalau masih ada kendala kami akan bantu proses lebih lanjut ya kak",
           "Boleh dicoba untuk menekan tombol LOW di remote ya kak, kalau lampu kuning pada unit sudah menyala berarti sudah normal alatnya"
         ],
         "confirm_templates": [
@@ -128,9 +128,9 @@
           "Mohon cek sakelar MCB—apakah dalam posisi ON?"
         ],
         "instruct_templates": [
-          "Kalau belum menyala, mohon cek MCB di panel listrik. Bila saklarnya turun, naikkan kembali lalu coba nyalakan unit. Jika lampu kuning pada unit menyala, artinya aman dan sudah normal. Ditunggu kabarnya ya kak, semoga masalahnya bisa segera terselesaikan ya",
+          "Kalau belum menyala, mohon cek MCB di panel listrik. Bila saklarnya turun, naikkan kembali lalu coba nyalakan unit. Jika lampu kuning pada unit menyala, artinya aman dan sudah normal. Kami tunggu konfirmasinya ya kak",
           "Tolong lihat MCB-nya, apakah turun? Jika ya, naikkan kembali dan hidupkan unit. Umumnya langsung menyala",
-          "Boleh coba dicek MCB-nya turun ngga kak? Kalau MCB uda dinaikkan saklarnya, tapi masih ngga nyala unitnya, silakan hubungi kami kembali ya"
+          "Boleh coba dicek MCB-nya turun ngga kak? Kalau MCB uda dinaikkan saklarnya, tapi masih ngga nyala unitnya, kami akan bantu jadwalkan teknisi ya kak"
         ],
         "confirm_templates": [
           "Setelah MCB ON, apakah alatnya menyala kak?",
@@ -222,7 +222,7 @@
         ],
         "resolve_templates": [
           "Bila bunyi hanya sesekali lalu hilang, itu masih dalam batas normal, EAC sedang memecah partikel2 yang ada di udara. kalau bunyinya jadi semakin sering, bisa tolong kabari kami yaa",
-          "Bunyi jarang terjadi biasanya normal. Apabila frekuensinya meningkat, silakan hubungi kami untuk pemeriksaan.",
+          "Bunyi jarang terjadi biasanya normal. Apabila frekuensinya meningkat, kami akan bantu jadwalkan teknisi untuk pemeriksaan ya kak.",
           "Bunyi tersebut berarti alat kak berfungsi dengan normal kak, tapi jika bunyinya sering dan terus-menerus berarti ada kotoran yang nyangkut dan perlu dibersihkan."
         ],
         "pending_templates": [

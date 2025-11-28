@@ -15,6 +15,7 @@ from .session_logger import get_wa_logger
 from .chat_logger import get_chat_logger
 from .ollama_client import OllamaClient
 from .data_collector import DataCollector
+from .text_normalizer import TextNormalizer
 
 def short_log(logger, jid: str, stage: str, info_or_msg: Any):
     try:
@@ -52,6 +53,7 @@ class ConversationEngine:
 
         self.ollama = OllamaClient()
         self.data_collector = DataCollector(self.ollama, self.memstore)
+        self.text_normalizer = TextNormalizer()
 
     def load_sop_from_file(self) -> dict:
         sop_path = os.path.join(BASE, "data", "kb", "sop.json")
@@ -122,6 +124,8 @@ class ConversationEngine:
         )
 
     def detect_intent_via_llm(self, user_id: str, message: str, sop_intents: list[str]) -> Dict[str, Any]:
+        message = self.text_normalizer.normalize_for_intent(message)
+        
         sop = self.load_sop_from_file()
         active_intent = self.memstore.get_flag(user_id, "active_intent")
 
@@ -572,6 +576,7 @@ class ConversationEngine:
 
             Tulis pesan penutup sopan 2–3 kalimat tanpa tanda tanya.
             Fokus: data sudah diterima, teknisi akan menghubungi kembali.
+            JANGAN sebutkan nama pelanggan di pesan penutup.
             """
             
             system_msg_complete = "Asisten CS teknis Honeywell profesional, sopan dan on-point. "
@@ -650,6 +655,8 @@ class ConversationEngine:
         return reply
 
     def parse_answer_via_llm(self, user_id: str, message: str, expected_results: list, question_context: str = "") -> str:
+        message = self.text_normalizer.normalize_text(message)
+        
         msg_lower = message.lower().strip()
         words = msg_lower.split()
         
@@ -1056,16 +1063,28 @@ class ConversationEngine:
             return f"{response} {follow_up}"
         
         elif dtype == "question":
-            system_msg = "CS Honeywell yang helpful."
-            prompt = f"""Customer: "{message}"\nJawab SINGKAT (maks 8 kata):\n- Harga/biaya → "Akan kami konfirmasi kak"\n- Teknisi/jadwal → "Nanti kami kabari kak"\n- Garansi → "1 tahun kak"\nJangan kata "Anda". Response:"""
-            response = self.ollama.generate(system=system_msg, prompt=prompt).strip()
-            return f"{response} Balik ke EAC nya ya, {follow_up.lower()}"
+            msg_lower = message.lower()
+            if "harga" in msg_lower or "biaya" in msg_lower:
+                response = "Untuk harga/biaya nanti kami bantu konfirmasi kak"
+            elif "teknisi" in msg_lower or "jadwal" in msg_lower or "kapan" in msg_lower:
+                response = "Nanti kami kabari jadwal teknisinya ya kak"
+            elif "garansi" in msg_lower:
+                response = "Garansi produk Honeywell 1 tahun kak"
+            else:
+                response = "Nanti kami bantu infokan kak"
+            return f"{response}. Balik ke EAC nya ya, {follow_up.lower()}"
         
         elif dtype == "chitchat":
-            system_msg = "CS ramah."
-            prompt = f"""Customer: "{message}"\nJawab SANGAT SINGKAT (4-5 kata), natural:\n- "panas ya" → "Iya kak, memang terik."\n- "makasih" → "Sama-sama kak."\nResponse:"""
-            response = self.ollama.generate(system=system_msg, prompt=prompt).strip()
-            return f"{response} Oh iya kak, {follow_up.lower()}"
+            msg_lower = message.lower()
+            if "terima kasih" in msg_lower or "makasih" in msg_lower or "thanks" in msg_lower:
+                response = "Sama-sama kak"
+            elif "panas" in msg_lower or "dingin" in msg_lower or "hujan" in msg_lower or "cuaca" in msg_lower:
+                response = "Iya kak"
+            elif "oke" in msg_lower or "ok" in msg_lower or "baik" in msg_lower or "siap" in msg_lower:
+                response = "Baik kak"
+            else:
+                response = "Oke kak"
+            return f"{response}. Oh iya, {follow_up.lower()}"
         
         return follow_up
     
@@ -2778,7 +2797,7 @@ class ConversationEngine:
             short_log(self.logger, user_id, "spam_blocked", f"Blocked for {remaining}min")
             return self._log_and_return(user_id, {
                 "bubbles": [{
-                    "text": f"Maaf kak, mohon tunggu {remaining} menit lagi ya 🙏"
+                    "text": f"Maaf kak, mohon tunggu {remaining} menit lagi ya"
                 }], 
                 "next": "end",
                 "status": "blocked"
@@ -2791,7 +2810,7 @@ class ConversationEngine:
             
             if spam_check["is_profanity"]:
                 return self._log_and_return(user_id, {
-                    "bubbles": [{"text": "🙏"}], 
+                    "bubbles": [{"text": "Maaf kak, saya belum bisa menangkap maksudnya. Bisa diperjelas lagi?"}], 
                     "next": "await_reply"
                 }, {"context": "profanity_filtered"})
             
@@ -2806,7 +2825,7 @@ class ConversationEngine:
                 short_log(self.logger, user_id, "spam_hard_limit", "User flagged as spam_user")
                 return self._log_and_return(user_id, {
                     "bubbles": [{
-                        "text": "Kak, untuk bantuan lebih lanjut silakan hubungi customer service kami ya 🙏"
+                        "text": "Kak, untuk bantuan lebih lanjut silakan hubungi customer service kami ya"
                     }], 
                     "next": "end",
                     "status": "spam_blocked"
@@ -2820,7 +2839,7 @@ class ConversationEngine:
                 short_log(self.logger, user_id, "spam_medium_limit", "User blocked for 1 hour")
                 return self._log_and_return(user_id, {
                     "bubbles": [{
-                        "text": "Kak, terlalu banyak pesan dalam waktu singkat. Mohon tunggu 1 jam ya 🙏"
+                        "text": "Kak, terlalu banyak pesan dalam waktu singkat. Mohon tunggu 1 jam ya"
                     }], 
                     "next": "end",
                     "status": "blocked"
@@ -2836,7 +2855,7 @@ class ConversationEngine:
             
             else:
                 return self._log_and_return(user_id, {
-                    "bubbles": [{"text": "🙏"}], 
+                    "bubbles": [{"text": "Baik kak"}], 
                     "next": "await_reply"
                 }, {"context": "spam_filtered"})
         
@@ -2848,9 +2867,9 @@ class ConversationEngine:
             
             if simple_ack:
                 ack_responses = [
-                    "Siap kak 👍",
-                    "Baik kak, senang bisa membantu 😊",
-                    "Sama-sama kak, jangan ragu hubungi kami lagi ya 🙏",
+                    "Siap kak",
+                    "Baik kak, senang bisa membantu",
+                    "Sama-sama kak, jangan ragu hubungi kami lagi ya",
                 ]
                 ack_msg = random.choice(ack_responses)
                 self.memstore.append_history(user_id, "bot", ack_msg)
@@ -3046,9 +3065,8 @@ class ConversationEngine:
                                  f"Simple ack after pending complete, minimal response")
                         
                         ack_responses = [
-                            "🙏",
-                            "Siap kak 👍",
-                            "Terima kasih kak 😊"
+                            "Sama-sama kak, siap membantu",
+                            "Baik kak, hubungi kami kapan saja",
                         ]
                         ack_msg = random.choice(ack_responses)
                         self.memstore.append_history(user_id, "bot", ack_msg)
@@ -3114,28 +3132,7 @@ class ConversationEngine:
                                  f"Distraction type: {distraction_type}, redirect to troubleshooting")
                     
                     else:
-                        system_msg = "Kamu adalah CS Honeywell yang ramah. Jawab SANGAT SINGKAT dan natural."
-                        chitchat_prompt = f"""
-                        Customer bilang: "{msg}"
-                        
-                        Tugas:
-                        1. Jawab dengan SANGAT SINGKAT (maksimal 1 kalimat pendek, 5-7 kata)
-                        2. Natural dan friendly
-                        3. Jangan bertele-tele
-                        
-                        Contoh bagus:
-                        - "wah panas ya" → "Iya kak, memang lagi panas."
-                        - "berapa lama garansinya?" → "Garansi 1 tahun kak."
-                        - "mahal ga?" → "Untuk harga bisa hubungi sales kak."
-                        - "kapan teknisi datang?" → "Nanti kami konfirmasi jadwalnya kak."
-                        
-                        Contoh BURUK (terlalu panjang):
-                        - "Terima kasih atas pertanyaannya. Untuk informasi garansi..." (TERLALU PANJANG)
-                        
-                        Jawab HANYA response-nya (tanpa tanda kutip):
-                        """
-                        chitchat_response = self.ollama.generate(system=system_msg, prompt=chitchat_prompt).strip()
-                        combined_response = f"{chitchat_response} Oh iya kak, balik ke EAC nya, {troubleshoot_question.lower()}"
+                        combined_response = f"Baik kak. Oh iya, balik ke EAC nya, {troubleshoot_question.lower()}"
                         
                         short_log(self.logger, user_id, "chitchat_handled", 
                                  f"Chitchat detected, redirected to active troubleshooting")
@@ -3207,20 +3204,73 @@ class ConversationEngine:
                 short_log(self.logger, user_id, "new_complaint_while_pending", 
                          f"New complaint detected while pending")
                 
-                ack_msg = "Baik Kak, keluhan baru akan kami catat. Untuk saat ini data collection masih berjalan untuk keluhan sebelumnya."
-                self.memstore.append_history(user_id, "bot", ack_msg)
+                detected_intent = sop_intent if sop_intent != "none" else None
+                if not detected_intent:
+                    unified_check = self.detect_intent_via_llm(user_id, msg, sop_intents)
+                    detected_intent = unified_check.get("intent", "none")
                 
-                if sop_intent != "none":
-                    self._queue_additional_complaint(user_id, sop_intent)
-                
-                return self._log_and_return(user_id, {"bubbles": [{"text": ack_msg}], "next": "await_reply", "status": "open"}, {"context": "new_complaint_queued"})
+                if detected_intent and detected_intent != "none" and detected_intent != active_intent:
+                    self._queue_additional_complaint(user_id, detected_intent)
+                    
+                    complaint_names = {
+                        "mati": "tidak menyala",
+                        "bunyi": "bunyi tidak normal",
+                        "bau": "bau tidak sedap"
+                    }
+                    complaint_text = complaint_names.get(detected_intent, detected_intent)
+                    
+                    ack_msg = f"Baik Kak, keluhan '{complaint_text}' sudah kami catat. Untuk saat ini kita selesaikan dulu data collection untuk keluhan sebelumnya ya."
+                    self.memstore.append_history(user_id, "bot", ack_msg)
+                    
+                    return self._log_and_return(user_id, {
+                        "bubbles": [{"text": ack_msg}], 
+                        "next": "await_reply", 
+                        "status": "open"
+                    }, {"context": "new_complaint_queued", "queued_intent": detected_intent})
+                else:
+                    ack_msg = "Baik Kak, keluhan baru akan kami catat. Untuk saat ini data collection masih berjalan untuk keluhan sebelumnya."
+                    self.memstore.append_history(user_id, "bot", ack_msg)
+                    return self._log_and_return(user_id, {
+                        "bubbles": [{"text": ack_msg}], 
+                        "next": "await_reply", 
+                        "status": "open"
+                    }, {"context": "new_complaint_generic"})
             
             if active_intent and active_intent != "none":
                 python_additional = self._detect_additional_complaint_python(msg, active_intent)
+                
+                if python_additional == "none" and additional_complaint != "none":
+                    python_additional = additional_complaint
+                
                 if python_additional != "none":
                     self._queue_additional_complaint(user_id, python_additional)
+                    
+                    complaint_names = {
+                        "mati": "tidak menyala",
+                        "bunyi": "bunyi tidak normal", 
+                        "bau": "bau tidak sedap"
+                    }
+                    complaint_text = complaint_names.get(python_additional, python_additional)
+                    
                     short_log(self.logger, user_id, "additional_complaint_queued_pending", 
                              f"Queued '{python_additional}' during pending/data collection")
+                    
+                    identity = self.memstore.get_identity(user_id)
+                    state = self.data_collector.get_collection_state(user_id)
+                    next_field = state.get("next_field")
+                    
+                    if next_field:
+                        field_map = {"name": "nama", "product": "produk", "address": "alamat"}
+                        field_name = field_map.get(next_field, "data")
+                        
+                        ack_msg = f"Baik Kak, keluhan '{complaint_text}' sudah saya catat. Sekarang boleh dilanjut {field_name}nya?"
+                        self.memstore.append_history(user_id, "bot", ack_msg)
+                        
+                        return self._log_and_return(user_id, {
+                            "bubbles": [{"text": ack_msg}], 
+                            "next": "await_reply", 
+                            "status": "open"
+                        }, {"context": "additional_complaint_acknowledged", "queued": python_additional})
             
             if sop_intent != active_intent and sop_intent != "none" and is_new_complaint:
                 dc_result = self.data_collector.process_message(user_id, msg)
