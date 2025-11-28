@@ -329,6 +329,21 @@ class ConversationEngine:
 
         if active_intent and out.get("intent") in ("none", None):
             out["intent"] = active_intent
+        
+        intensity_detected = False
+        if out.get("intent") == "bunyi" and not active_intent:
+            msg_lower = message.lower()
+            intensity_words = [
+                'banget', 'parah', 'sangat', 'sekali', 'terus-terusan', 
+                'terus menerus', 'gak berhenti', 'tidak berhenti', 'selalu',
+                'setiap saat', 'tiap saat', 'hebat', 'keras banget', 'keras sekali'
+            ]
+            
+            if any(word in msg_lower for word in intensity_words):
+                intensity_detected = True
+                short_log(self.logger, user_id, "intensity_detected", f"Bunyi dengan intensity: {message[:50]}")
+        
+        out["intensity_detected"] = intensity_detected
 
         return out
 
@@ -1238,6 +1253,334 @@ class ConversationEngine:
         simple_acks = ['iya', 'ya', 'ok', 'oke', 'baik', 'sip', 'siap']
         return msg_lower in simple_acks or (len(words) <= 2 and all(w in simple_acks for w in words))
     
+    def _detect_indonesian_verbs(self, message: str) -> list:
+        msg_lower = message.lower()
+        words = msg_lower.split()
+        
+        common_verbs = [
+            'mati', 'hidup', 'nyala', 'menyala', 'jalan', 'berjalan',
+            'bunyi', 'berbunyi', 'berisik', 'rusak', 'error', 'padam',
+            'bau', 'berbau', 'ada', 'punya', 'mengalami', 'terjadi',
+            'muncul', 'keluar', 'masuk', 'berhenti', 'mulai',
+            'coba', 'periksa', 'cek', 'lihat', 'tekan', 'matikan', 'nyalakan',
+            'ganti', 'bersihkan', 'pasang', 'lepas', 'buka', 'tutup'
+        ]
+        
+        me_verbs = [w for w in words if w.startswith('me') and len(w) > 3]
+        ber_verbs = [w for w in words if w.startswith('ber') and len(w) > 4]
+        ter_verbs = [w for w in words if w.startswith('ter') and len(w) > 4]
+        
+        common_found = [w for w in words if w in common_verbs]
+        
+        tidak_patterns = []
+        for i, w in enumerate(words):
+            if w in ['tidak', 'tak', 'gak', 'ga', 'nggak', 'ngga']:
+                if i + 1 < len(words):
+                    tidak_patterns.append(f"{w} {words[i+1]}")
+        
+        all_verbs = list(set(common_found + me_verbs + ber_verbs + ter_verbs))
+        
+        return all_verbs
+    
+    def _detect_subject(self, message: str) -> dict:
+        msg_lower = message.lower()
+        words = msg_lower.split()
+        
+        subjects = {
+            "personal": ['saya', 'aku', 'gue', 'gw', 'kita', 'kami'],
+            "device": ['eac', 'water heater', 'pemanas', 'alat', 'unit', 'mesin', 'produk'],
+            "demonstrative": ['ini', 'itu', 'nya']
+        }
+        
+        found_subjects = []
+        subject_type = None
+        
+        for stype, slist in subjects.items():
+            for subj in slist:
+                if subj in msg_lower:
+                    found_subjects.append(subj)
+                    if not subject_type:
+                        subject_type = stype
+        
+        possessive_patterns = []
+        for i, w in enumerate(words):
+            if w in subjects["personal"] or w in subjects["device"]:
+                if i + 1 < len(words) and words[i+1] in subjects["device"]:
+                    possessive_patterns.append(f"{w} {words[i+1]}")
+                elif i > 0 and words[i-1] in subjects["device"]:
+                    possessive_patterns.append(f"{words[i-1]} {w}")
+        
+        return {
+            "has_subject": len(found_subjects) > 0,
+            "subjects": found_subjects,
+            "type": subject_type,
+            "possessive_patterns": possessive_patterns,
+            "is_complete_subject": len(possessive_patterns) > 0 or (len(found_subjects) > 0 and subject_type == "personal")
+        }
+    
+    def _analyze_sentence_structure(self, message: str) -> dict:
+        msg_lower = message.lower().strip()
+        words = msg_lower.split()
+        
+        verbs = self._detect_indonesian_verbs(message)
+        subject_info = self._detect_subject(message)
+        
+        has_verb = len(verbs) > 0
+        has_subject = subject_info["has_subject"]
+        has_complete_subject = subject_info["is_complete_subject"]
+        
+        has_punctuation = any(p in message for p in ['.', '!', '?'])
+        
+        temporal_markers = ['kemarin', 'tadi', 'barusan', 'sekarang', 'baru saja', 'sejak', 'sudah', 'belum']
+        has_temporal = any(marker in msg_lower for marker in temporal_markers)
+        
+        modifiers = ['sangat', 'banget', 'sekali', 'agak', 'sedikit', 'terlalu', 'cukup']
+        has_modifier = any(mod in msg_lower for mod in modifiers)
+        
+        conjunctions = ['dan', 'atau', 'tapi', 'tetapi', 'namun', 'serta', 'karena', 'sebab', 'jadi', 'lalu', 'kemudian']
+        has_conjunction = any(conj in msg_lower for conj in conjunctions)
+        
+        score = 0
+        max_score = 10
+        
+        if has_verb:
+            score += 4
+        if has_complete_subject:
+            score += 3
+        elif has_subject:
+            score += 1
+        if has_temporal:
+            score += 1
+        if has_modifier:
+            score += 1
+        if has_punctuation:
+            score += 1
+        if len(words) >= 4:
+            score += min(len(words) - 3, 2)
+        
+        if has_conjunction and not has_verb:
+            score -= 1
+        
+        completeness_ratio = score / max_score
+        
+        return {
+            "has_verb": has_verb,
+            "verbs": verbs,
+            "has_subject": has_subject,
+            "has_complete_subject": has_complete_subject,
+            "subject_info": subject_info,
+            "has_temporal": has_temporal,
+            "has_modifier": has_modifier,
+            "has_conjunction": has_conjunction,
+            "word_count": len(words),
+            "completeness_score": score,
+            "completeness_ratio": completeness_ratio,
+            "is_structurally_complete": completeness_ratio >= 0.6
+        }
+    
+    def _is_incomplete_message(self, user_id: str, message: str, active_intent: str) -> bool:
+        msg_lower = message.lower().strip()
+        words = msg_lower.split()
+        
+        if active_intent and active_intent != "none":
+            return False
+        
+        structure = self._analyze_sentence_structure(message)
+        
+        if structure["is_structurally_complete"]:
+            short_log(self.logger, user_id, "smart_wait_complete", 
+                     f"Structurally complete (score: {structure['completeness_ratio']:.2f}): '{message[:50]}'")
+            return False
+        
+        if not structure["has_verb"] and not structure["has_subject"]:
+            short_log(self.logger, user_id, "smart_wait_incomplete_no_verb_subject", 
+                     f"No verb + no subject: '{message[:50]}'")
+            return True
+        
+        if structure["has_subject"] and not structure["has_verb"]:
+            if structure["word_count"] <= 3:
+                short_log(self.logger, user_id, "smart_wait_incomplete_fragment", 
+                         f"Subject only, no verb: '{message[:50]}'")
+                return True
+        
+        greeting_only = ['halo', 'hai', 'hi', 'pagi', 'siang', 'sore', 'malam', 'selamat']
+        if any(greet in msg_lower for greet in greeting_only) and len(words) <= 3:
+            complaint_keywords = ['mati', 'bunyi', 'bau', 'rusak', 'error', 'masalah', 'kendala', 'eac', 'water heater']
+            if not any(kw in msg_lower for kw in complaint_keywords):
+                short_log(self.logger, user_id, "smart_wait_greeting_only", 
+                         f"Greeting without complaint: '{message[:50]}'")
+                return True
+        
+        if structure["completeness_ratio"] < 0.4 and structure["word_count"] <= 4:
+            short_log(self.logger, user_id, "smart_wait_low_score", 
+                     f"Low completeness ({structure['completeness_ratio']:.2f}): '{message[:50]}'")
+            return True
+        
+        vague_phrases = [
+            'saya mengalami kendala',
+            'ada masalah',
+            'ada kendala',
+            'mau tanya',
+            'mau lapor',
+            'eac saya',
+            'water heater saya',
+            'alat saya',
+            'kemarin',
+            'tadi',
+            'barusan'
+        ]
+        
+        has_vague = any(phrase in msg_lower for phrase in vague_phrases)
+        
+        complaint_keywords = [
+            'mati', 'tidak menyala', 'gak nyala', 'ga nyala', 'tidak hidup',
+            'bunyi', 'berisik', 'suara', 'noise', 
+            'bau', 'aroma', 'berbau',
+            'rusak', 'error', 'tidak berfungsi', 'padam', 'off'
+        ]
+        has_complaint = any(kw in msg_lower for kw in complaint_keywords)
+        
+        if has_vague and not has_complaint:
+            short_log(self.logger, user_id, "smart_wait_vague_no_complaint", 
+                     f"Vague phrase without specific complaint: '{message[:50]}'")
+            return True
+        
+        if len(words) <= 2 and not has_complaint:
+            short_log(self.logger, user_id, "smart_wait_too_short", 
+                     f"Too short without complaint: '{message[:50]}'")
+            return True
+        
+        short_log(self.logger, user_id, "smart_wait_complete_fallback", 
+                 f"Passed all checks (score: {structure['completeness_ratio']:.2f}): '{message[:50]}'")
+        return False
+    
+    def _should_wait_for_more_input(self, user_id: str, is_incomplete: bool) -> dict:
+        now = datetime.now(timezone.utc)
+        last_incomplete_ts = self.memstore.get_flag(user_id, "last_incomplete_ts")
+        
+        WAIT_WINDOW_SECONDS = 3
+        
+        if is_incomplete:
+            self.memstore.set_flag(user_id, "last_incomplete_ts", now.isoformat())
+            self.memstore.set_flag(user_id, "incomplete_count", 
+                                  (self.memstore.get_flag(user_id, "incomplete_count") or 0) + 1)
+            
+            return {
+                "should_wait": True,
+                "reason": "incomplete_message",
+                "wait_seconds": WAIT_WINDOW_SECONDS
+            }
+        
+        if last_incomplete_ts:
+            last_ts = datetime.fromisoformat(last_incomplete_ts.replace('Z', '+00:00'))
+            elapsed = (now - last_ts).total_seconds()
+            
+            if elapsed <= WAIT_WINDOW_SECONDS:
+                self.memstore.clear_flag(user_id, "last_incomplete_ts")
+                self.memstore.clear_flag(user_id, "incomplete_count")
+                
+                return {
+                    "should_wait": False,
+                    "reason": "complete_after_wait",
+                    "elapsed_seconds": elapsed
+                }
+        
+        self.memstore.clear_flag(user_id, "last_incomplete_ts")
+        self.memstore.clear_flag(user_id, "incomplete_count")
+        
+        return {
+            "should_wait": False,
+            "reason": "normal_flow"
+        }
+    
+    def _init_message_buffer(self, user_id: str) -> None:
+        buffer = {
+            "messages": [],
+            "start_ts": datetime.now(timezone.utc).isoformat(),
+            "count": 0
+        }
+        self.memstore.set_flag(user_id, "message_buffer", buffer)
+    
+    def _add_to_buffer(self, user_id: str, message: str) -> dict:
+        buffer = self.memstore.get_flag(user_id, "message_buffer")
+        
+        if not buffer:
+            self._init_message_buffer(user_id)
+            buffer = self.memstore.get_flag(user_id, "message_buffer")
+        
+        buffer["messages"].append({
+            "text": message,
+            "ts": datetime.now(timezone.utc).isoformat()
+        })
+        buffer["count"] = len(buffer["messages"])
+        
+        self.memstore.set_flag(user_id, "message_buffer", buffer)
+        return buffer
+    
+    def _get_buffer_age(self, user_id: str) -> float:
+        buffer = self.memstore.get_flag(user_id, "message_buffer")
+        if not buffer or "start_ts" not in buffer:
+            return 0.0
+        
+        start_ts = datetime.fromisoformat(buffer["start_ts"].replace('Z', '+00:00'))
+        now = datetime.now(timezone.utc)
+        return (now - start_ts).total_seconds()
+    
+    def _should_flush_buffer(self, user_id: str, current_message: str, is_incomplete: bool) -> dict:
+        CONTEXT_WINDOW_SECONDS = 5
+        
+        buffer = self.memstore.get_flag(user_id, "message_buffer")
+        
+        if not buffer or buffer["count"] == 0:
+            return {
+                "should_flush": False,
+                "reason": "empty_buffer"
+            }
+        
+        age = self._get_buffer_age(user_id)
+        
+        if age >= CONTEXT_WINDOW_SECONDS:
+            return {
+                "should_flush": True,
+                "reason": "window_timeout",
+                "age": age
+            }
+        
+        if not is_incomplete:
+            return {
+                "should_flush": True,
+                "reason": "complete_message",
+                "age": age
+            }
+        
+        if buffer["count"] >= 5:
+            return {
+                "should_flush": True,
+                "reason": "buffer_full",
+                "age": age
+            }
+        
+        return {
+            "should_flush": False,
+            "reason": "accumulating",
+            "age": age,
+            "count": buffer["count"]
+        }
+    
+    def _combine_buffered_messages(self, user_id: str) -> str:
+        buffer = self.memstore.get_flag(user_id, "message_buffer")
+        
+        if not buffer or buffer["count"] == 0:
+            return ""
+        
+        messages = buffer["messages"]
+        combined = " ".join([msg["text"] for msg in messages])
+        
+        return combined.strip()
+    
+    def _clear_message_buffer(self, user_id: str) -> None:
+        self.memstore.clear_flag(user_id, "message_buffer")
+    
     def _check_spam_or_profanity(self, user_id: str, message: str) -> Dict[str, bool]:
         msg_lower = message.lower().strip()
         msg_clean = msg_lower.replace(' ', '')
@@ -1584,6 +1927,24 @@ class ConversationEngine:
         return out
 
     def _naturalize_template(self, user_id: str, template_text: str, action_type: str) -> str:
+        import re
+        
+        simple_patterns = [
+            r'^Kak,\s+(bunyinya\s+)?sering\s+atau\s+jarang\??\s*$',
+            r'^Apakah\s+.+\s+atau\s+.+\??\s*$',
+            r'^.{1,50}\s+(ya|iya|tidak|yes|no)\??\s*$',
+        ]
+        
+        template_clean = template_text.strip()
+        for pattern in simple_patterns:
+            if re.match(pattern, template_clean, re.IGNORECASE):
+                simple_transform = template_clean
+                simple_transform = re.sub(r'\bsilakan\b', 'coba', simple_transform, flags=re.IGNORECASE)
+                simple_transform = re.sub(r'\bmohon\b', 'tolong', simple_transform, flags=re.IGNORECASE)
+                simple_transform = re.sub(r'^Apakah\s+', 'Kak, ', simple_transform)
+                short_log(self.logger, user_id, "skip_naturalize", f"Template sudah sederhana: {template_text[:50]}")
+                return simple_transform
+        
         history = self.memstore.get_history(user_id)
         last_user_msg = ""
         for h in reversed(history):
@@ -1593,7 +1954,7 @@ class ConversationEngine:
         
         system_msg = "Kamu adalah CS Honeywell yang ramah, sopan, dan profesional. Gunakan bahasa Indonesia yang baik dan benar."
         
-        prompt = f"""Tugas: Ubah template SOP menjadi lebih natural TANPA mengubah makna atau informasi yang ada.
+        prompt = f"""Tugas: Ubah template SOP menjadi lebih natural dan conversational TANPA mengubah makna atau informasi yang ada.
 
         Pesan terakhir customer: "{last_user_msg}"
 
@@ -1601,16 +1962,42 @@ class ConversationEngine:
 
         Aturan WAJIB:
         1. PERTAHANKAN semua informasi dari template - jangan tambah, kurang, atau ubah
-        2. Tetap profesional dan sopan sebagai customer service
-        3. Gunakan bahasa Indonesia yang baik dan benar - JANGAN gunakan bahasa asing
-        4. DILARANG gunakan bahasa gaul: "dong", "aja", "gitu", "sih", "gimana", "ngga"
-        5. DILARANG gunakan kata serapan salah: "teknisian" (gunakan "teknisi")
-        6. Gunakan "kak" untuk sapaan
-        7. Tidak gunakan kata "Anda"
-        8. Maksimal 3 kalimat
+        2. PERTAHANKAN struktur pertanyaan, instruksi, dan kondisi if-then
+        3. Tetap profesional dan sopan sebagai customer service
+        4. Gunakan bahasa Indonesia yang baik dan benar - JANGAN gunakan bahasa asing
+        5. DILARANG gunakan bahasa gaul: "dong", "aja", "gitu", "sih", "gimana", "ngga", "nggak", "gak", "ga"
+        6. DILARANG gunakan kata serapan salah: "teknisian" (gunakan "teknisi")
+        7. Gunakan "kak" untuk sapaan
+        8. Tidak gunakan kata "Anda"
         9. Hindari tanda kutip
-        10. Jangan bertele-tele
+        10. Jangan bertele-tele tapi jangan hilangkan informasi penting
         11. JANGAN mengarang atau mengubah konteks - ikuti template dengan ketat
+        12. Gunakan kata pengantar natural seperti "sepertinya", "mungkin" untuk membuat lebih conversational
+        13. Hindari pembuka kalimat yang terlalu formal atau kaku
+        14. HINDARI kata formal: "silakan", "harap", "mohon", "jika" (di awal kalimat), "apabila", "bisa dicek"
+        15. GUNAKAN alternatif natural: "coba", "boleh", "kalau", "bisa dicoba", "bisa bantu"
+        16. JANGAN ubah pertanyaan menjadi pernyataan
+        17. JANGAN hilangkan instruksi atau follow-up action
+
+        PENTING untuk pertanyaan:
+        - Pertanyaan harus tetap jelas dan spesifik
+        - Jangan ubah "apakah X atau Y?" menjadi pernyataan
+        - Contoh SALAH: "Kak, sepertinya alatnya berisik sering banget. Coba periksa kalau bisa?" ❌
+        - Contoh BENAR: "Kak, bunyinya sering terjadi atau hanya sesekali saja?" ✅
+
+        PENTING untuk instruksi:
+        - Pertahankan urutan: kondisi → aksi → expected result → follow up
+        - Jangan potong instruksi multi-step
+        - Jangan hilangkan kondisi "jika/kalau"
+
+        Transformasi kata formal ke natural:
+        - "silakan" → "coba" atau "bisa"
+        - "jika" (awal kalimat) → "kalau"
+        - "jika" (tengah kalimat) → tetap "jika" atau "kalau"
+        - "bisa dicek" → "boleh dicek" atau "coba cek"
+        - "apabila" → "kalau"
+        - "Mohon" → "Tolong" atau "Boleh"
+        - "nggak/gak/ga" → "belum" atau "tidak"
 
         Contoh konversi yang BENAR:
         Template: "Baik kak, saya teruskan ke teknisi ya."
@@ -1618,17 +2005,35 @@ class ConversationEngine:
 
         Template: "Kak, bisa dicek posisi MCB-nya apakah sedang di posisi ON?"
         Natural: "Kak, boleh dicek apakah MCB-nya sudah dalam posisi ON?"
+        
+        Template: "Kak, bunyinya sering atau jarang?"
+        Natural: "Kak, bunyinya sering terjadi atau hanya sesekali saja?"
+        
+        Template: "Silakan tekan tombol Low Mode di remote. Jika lampu kuning menyala, unit sudah normal."
+        Natural: "Coba tekan tombol Low Mode di remote ya kak. Kalau lampu kuning menyala, berarti unit sudah normal."
+        
+        Template: "Silakan hubungi kami lagi jika masih ada kendala."
+        Natural: "Kalau masih ada kendala, chat kami lagi ya kak."
 
         Contoh konversi yang SALAH (jangan seperti ini):
+        Template: "Kak, bunyinya sering atau jarang?"
+        SALAH: "Kak, sepertinya alatnya berisik. Coba periksa?" ❌ (mengubah pertanyaan jadi pernyataan)
+        
         Template: "Baik kak, saya teruskan ke teknisi ya."
         SALAH: "Teruskan dong ke teknisi ya..." ❌ (bahasa gaul)
-        SALAH: "Buat nyambung aja kita cek..." ❌ (mengubah makna)
+        
+        Template: "Jika belum menyala, coba tekan tombol LOW."
+        SALAH: "Coba tekan tombol LOW." ❌ (hilangkan kondisi "jika belum menyala")
 
         Ubah template di atas menjadi lebih natural dalam BAHASA INDONESIA:"""
         
         reply = self.ollama.generate(system=system_msg, prompt=prompt).strip()
         
         reply = reply.replace('"', '').replace("'", '')
+        
+        import re
+        reply = re.sub(r'\b[Aa]nda\b', 'kak', reply)
+        reply = re.sub(r'\bkakak\b', 'kak', reply)
         
         try:
             cjk_pattern = r'[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]'
@@ -1716,7 +2121,6 @@ class ConversationEngine:
         
         return reply
 
-
     def _execute_llm_decision(self, user_id: str, decision: dict, intent: str, sop: dict) -> dict:
         
         action = decision.get("action", "clarify")
@@ -1773,6 +2177,20 @@ class ConversationEngine:
             ask_text = random.choice(ask_list) if ask_list else "(template ask kosong)"
             
             reply = self._naturalize_template(user_id, ask_text, "ask")
+            
+            logic = step_def.get("logic", {})
+            if logic.get("pending_on_first_ask"):
+                self.memstore.append_history(user_id, "bot", reply)
+                
+                self.memstore.set_flag(user_id, "sop_pending", True)
+                self.memstore.set_flag(user_id, "pending_just_triggered", True)
+                
+                name_question = self.data_collector.generate_question(user_id, "name")
+                self.memstore.append_history(user_id, "bot", name_question)
+                
+                short_log(self.logger, user_id, "pending_on_first_ask", f"Intent: {intent}, Step: {active_step_id}")
+                
+                return {"bubbles": [{"text": reply}, {"text": name_question}], "next": "await_reply", "status": "open"}
             
             self.memstore.append_history(user_id, "bot", reply)
             return {"bubbles": [{"text": reply}], "next": "await_reply"}
@@ -1916,7 +2334,7 @@ class ConversationEngine:
         self.memstore.append_history(user_id, "bot", fallback)
         return {"bubbles": [{"text": fallback}], "next": "await_reply"}
 
-    def handle_exploration(self, user_id: str, message: str, sop: dict, intent: str, is_new_complaint: bool = False, additional_complaint: str = "none"):
+    def handle_exploration(self, user_id: str, message: str, sop: dict, intent: str, is_new_complaint: bool = False, additional_complaint: str = "none", intensity_detected: bool = False):
         current_active_intent = self.memstore.get_flag(user_id, "active_intent")
         sop_pending = self.memstore.get_flag(user_id, "sop_pending")
         sop_resolved = self.memstore.get_flag(user_id, "sop_resolved")
@@ -1981,6 +2399,27 @@ class ConversationEngine:
             self.memstore.clear_flag(user_id, "active_intent")
         
         self.memstore.set_flag(user_id, "active_intent", intent)
+        
+        if intensity_detected and intent == "bunyi" and not current_active_intent:
+            short_log(self.logger, user_id, "bunyi_intensity_skip", "Skip tanya frekuensi, langsung pending")
+            
+            first_step_id = sop["bunyi"]["steps"][0].get("id")
+            self.memstore.set_flag(user_id, f"{intent}_active_step", first_step_id)
+            self.update_troubleshoot_flags(user_id, intent, first_step_id, "sering")
+            
+            meta = sop.get("metadata", {})
+            step_def = sop["bunyi"]["steps"][0]
+            pending_list = step_def.get("pending_templates") or meta.get("general_templates", {}).get("closing_pending", [])
+            pending_template = random.choice(pending_list) if pending_list else "Saya bantu jadwalkan teknisi ya kak."
+            pending_msg = self._naturalize_template(user_id, pending_template, "pending")
+            
+            self.memstore.set_flag(user_id, "sop_pending", True)
+            self.memstore.append_history(user_id, "bot", pending_msg)
+            
+            name_question = self.data_collector.generate_question(user_id, "name")
+            self.memstore.append_history(user_id, "bot", name_question)
+            
+            return {"bubbles": [{"text": pending_msg}, {"text": name_question}], "next": "await_reply", "status": "open"}
         
         active_step_id = self.memstore.get_flag(user_id, f"{intent}_active_step")
         if not active_step_id and intent in sop:
@@ -2080,7 +2519,10 @@ class ConversationEngine:
                     self.memstore.set_flag(user_id, "pending_just_triggered", True)
                     self.memstore.append_history(user_id, "bot", pending_msg)
                     
-                    return {"bubbles": [{"text": pending_msg}], "next": "await_reply", "status": "open"}
+                    name_question = self.data_collector.generate_question(user_id, "name")
+                    self.memstore.append_history(user_id, "bot", name_question)
+                    
+                    return {"bubbles": [{"text": pending_msg}, {"text": name_question}], "next": "await_reply", "status": "open"}
         
         if not step_def:
             fallback = self._generate_natural_fallback(user_id, message, "no_step_def")
@@ -2091,6 +2533,21 @@ class ConversationEngine:
             ask_list = step_def.get("ask_templates", [])
             ask_template = random.choice(ask_list) if ask_list else "Boleh kami cek kondisi alatnya kak?"
             ask_msg = self._naturalize_template(user_id, ask_template, "ask")
+            
+            logic = step_def.get("logic", {})
+            if logic.get("pending_on_first_ask"):
+                self.memstore.append_history(user_id, "bot", ask_msg)
+                
+                self.memstore.set_flag(user_id, "sop_pending", True)
+                self.memstore.set_flag(user_id, "pending_just_triggered", True)
+                
+                name_question = self.data_collector.generate_question(user_id, "name")
+                self.memstore.append_history(user_id, "bot", name_question)
+                
+                short_log(self.logger, user_id, "pending_on_first_ask_exploration", f"Intent: {intent}, Step: {active_step['step_id']}")
+                
+                return {"bubbles": [{"text": ask_msg}, {"text": name_question}], "next": "await_reply", "status": "open"}
+            
             self.memstore.append_history(user_id, "bot", ask_msg)
             return {"bubbles": [{"text": ask_msg}], "next": "await_reply"}
         
@@ -2114,7 +2571,7 @@ class ConversationEngine:
             if clarify_count >= 3:
                 self.memstore.set_flag(user_id, f"{intent}_clarify_count", 0)
                 
-                escalate_msg = "Baik kak, sepertinya perlu pengecekan lebih detail oleh teknisi kami. Boleh saya bantu jadwalkan kunjungan teknisi?"
+                escalate_msg = "Baik kak, sepertinya perlu pengecekan lebih detail oleh teknisi kami.  Saya bantu jadwalkan kunjungan teknisi ya."
                 self.memstore.append_history(user_id, "bot", escalate_msg)
                 
                 self.memstore.set_flag(user_id, "sop_pending", True)
@@ -2122,7 +2579,10 @@ class ConversationEngine:
                 
                 short_log(self.logger, user_id, "clarify_escalated_exploration", f"Auto-escalate after {clarify_count} unclear answers")
                 
-                return {"bubbles": [{"text": escalate_msg}], "next": "await_reply", "status": "open"}
+                name_question = self.data_collector.generate_question(user_id, "name")
+                self.memstore.append_history(user_id, "bot", name_question)
+                
+                return {"bubbles": [{"text": escalate_msg}, {"text": name_question}], "next": "await_reply", "status": "open"}
             
             clarify_list = sop_state["metadata"].get("general_templates", {}).get("clarify", [])
             clarify_msg = random.choice(clarify_list) if clarify_list else "Boleh dijelaskan sedikit lagi kak?"
@@ -2200,7 +2660,10 @@ class ConversationEngine:
             self.memstore.set_flag(user_id, "pending_just_triggered", True)
             self.memstore.append_history(user_id, "bot", pending_msg)
             
-            return {"bubbles": [{"text": pending_msg}], "next": "await_reply", "status": "open"}
+            name_question = self.data_collector.generate_question(user_id, "name")
+            self.memstore.append_history(user_id, "bot", name_question)
+            
+            return {"bubbles": [{"text": pending_msg}, {"text": name_question}], "next": "await_reply", "status": "open"}
         
         if logic.get("next"):
             next_step_id = logic["next"]
@@ -2406,6 +2869,40 @@ class ConversationEngine:
         active_intent = self.memstore.get_flag(user_id, "active_intent")
         sop_pending_for_check = self.memstore.get_flag(user_id, "sop_pending")
         
+        is_incomplete = self._is_incomplete_message(user_id, msg, active_intent)
+        
+        skip_buffering = (
+            active_intent and active_intent != "none" or
+            sop_pending_for_check or
+            len(self.memstore.get_history(user_id)) >= 4
+        )
+        
+        should_skip_llm = is_incomplete and not skip_buffering
+        
+        if should_skip_llm:
+            short_log(self.logger, user_id, "skip_llm_incomplete", 
+                     f"Skip LLM for obviously incomplete: '{msg[:50]}'")
+            
+            self._add_to_buffer(user_id, msg)
+            buffer_info = self.memstore.get_flag(user_id, "message_buffer")
+            
+            wait_responses = [
+                "...",
+                "Ya kak?",
+                "Lanjut kak"
+            ]
+            minimal_response = random.choice(wait_responses)
+            self.memstore.append_history(user_id, "bot", minimal_response)
+            
+            return self._log_and_return(user_id, {
+                "bubbles": [{"text": minimal_response}], 
+                "next": "await_reply"
+            }, {
+                "context": "skip_llm_buffering",
+                "buffer_count": buffer_info.get("count", 0) if buffer_info else 1,
+                "skipped_llm": True
+            })
+        
         unified = self.detect_intent_via_llm(user_id, msg, sop_intents)
 
         category      = unified["category"]
@@ -2415,6 +2912,60 @@ class ConversationEngine:
         sop_intent    = unified["intent"]
         is_new_complaint = unified.get("is_new_complaint", False)
         additional_complaint = unified.get("additional_complaint", "none")
+        
+        if not skip_buffering:
+            self._add_to_buffer(user_id, msg)
+            flush_decision = self._should_flush_buffer(user_id, msg, is_incomplete)
+            
+            if not flush_decision["should_flush"]:
+                short_log(self.logger, user_id, "buffer_accumulating", 
+                         f"Buffering message {flush_decision.get('count', 0)}/{flush_decision.get('age', 0):.1f}s - {flush_decision['reason']}")
+                
+                wait_responses = [
+                    "...",
+                    "Ya kak?",
+                    "Lanjut kak"
+                ]
+                minimal_response = random.choice(wait_responses)
+                self.memstore.append_history(user_id, "bot", minimal_response)
+                
+                return self._log_and_return(user_id, {
+                    "bubbles": [{"text": minimal_response}], 
+                    "next": "await_reply"
+                }, {
+                    "context": "context_window_accumulating", 
+                    "reason": flush_decision["reason"],
+                    "buffer_count": flush_decision.get("count", 0),
+                    "buffer_age": flush_decision.get("age", 0)
+                })
+            
+            short_log(self.logger, user_id, "buffer_flush", 
+                     f"Flushing buffer - {flush_decision['reason']}, age: {flush_decision.get('age', 0):.1f}s")
+            
+            combined_message = self._combine_buffered_messages(user_id)
+            self._clear_message_buffer(user_id)
+            
+            if combined_message and combined_message != msg:
+                short_log(self.logger, user_id, "combined_context", f"Original: '{msg[:50]}' | Combined: '{combined_message[:100]}'")
+                
+                msg_for_processing = combined_message
+                
+                unified = self.detect_intent_via_llm(user_id, msg_for_processing, sop_intents)
+                
+                category = unified["category"]
+                has_greeting = unified["has_greeting"]
+                greeting_part = unified["greeting_part"]
+                issue_part = unified["issue_part"]
+                sop_intent = unified["intent"]
+                is_new_complaint = unified.get("is_new_complaint", False)
+                additional_complaint = unified.get("additional_complaint", "none")
+                
+                short_log(self.logger, user_id, "reprocessed_with_context", 
+                         f"Intent: {sop_intent}, Category: {category}, Combined from {flush_decision.get('age', 0):.1f}s window")
+        else:
+            short_log(self.logger, user_id, "skip_buffering", 
+                     f"Active flow detected - active_intent:{active_intent}, pending:{sop_pending_for_check}")
+            self._clear_message_buffer(user_id)
         
         rapid_switch_detected = False
         if active_intent and active_intent != "none":
@@ -2757,7 +3308,8 @@ class ConversationEngine:
                 sop=sop,
                 intent=sop_intent,
                 is_new_complaint=is_new_complaint,
-                additional_complaint=additional_complaint
+                additional_complaint=additional_complaint,
+                intensity_detected=unified.get("intensity_detected", False)
             )
             
             return self._log_and_return(user_id, result, {"context": "handle_exploration", "intent": sop_intent})

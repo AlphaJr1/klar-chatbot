@@ -177,9 +177,9 @@
         "type": "binary",
         "description": "Carbon filter membantu mengurangi bau.",
         "ask_templates": [
-          "Aroma tidak sedap biasanya dari carbon filter yang sudah kotor dan perlu diganti. Jika punya cadangan, silakan ganti filter karbon. Bila tidak ada cadangan, kami bisa bantu kirim/menjadwalkan teknisi untuk penggantian. Apakah mau kami jadwalkan untuk penggantian filternya kak?",
-          "Bau umumnya karena carbon filter perlu diganti. Apakah ingin kami jadwalkan penggantian atau kirim filter pengganti?",
-          "Untuk kasus bau, solusi paling efektif adalah mengganti carbon filter yang sudah kotor kak. Apakah mau kami jadwalkan untuk penggantian filternya kak?"
+          "Aroma tidak sedap biasanya dari carbon filter yang sudah kotor. Saya bantu jadwalkan penggantian carbon filternya ya kak.",
+          "Bau umumnya karena carbon filter perlu diganti. Saya bantu jadwalkan teknisi untuk penggantian filternya ya kak.",
+          "Untuk kasus bau, solusi paling efektif adalah mengganti carbon filter. Saya jadwalkan teknisi untuk penggantian ya kak."
         ],
         "offer_templates": [
           "Untuk mengurangi bau, disarankan memakai carbon filter kak.",
@@ -195,6 +195,7 @@
           "no"
         ],
         "logic": {
+          "pending_on_first_ask": true,
           "on_answer_yes": {
             "pending": true
           },
@@ -225,9 +226,9 @@
           "Bunyi tersebut berarti alat kak berfungsi dengan normal kak, tapi jika bunyinya sering dan terus-menerus berarti ada kotoran yang nyangkut dan perlu dibersihkan."
         ],
         "pending_templates": [
-          "Bunyi sering menandakan ada kotoran yang tersangkut di pre-filter/collector cell. Mohon matikan unit, bersihkan pre-filter sesuai buku manual (keringkan sempurna), lalu nyalakan kembali. Jika bunyi tetap muncul, kami sarankan pemeriksaan teknisi. Jika ingin kami bantu bersihkan juga bisa kak, apakah kakak ingin dibantu membersihkan alatnya oleh tim teknisi kami?",
-          "Bunyi berulang dan sering biasanya karena debu menumpuk / menyangkut. apakah kakak ingin dibantu membersihkan alatnya oleh tim teknisi kami?",
-          "Sepertinya unitnya perlu dibersihkan kak, karena ada kotoran yang menyangkut pada unitnya. Apakah mau kami jadwalkan teknisinya?"
+          "Bunyi sering menandakan ada kotoran yang tersangkut di pre-filter/collector cell. Saya bantu jadwalkan teknisi untuk pembersihan unit ya kak.",
+          "Bunyi berulang dan sering biasanya karena debu menumpuk. Saya jadwalkan teknisi untuk bantu bersihkan alatnya ya kak.",
+          "Sepertinya unitnya perlu dibersihkan kak, karena ada kotoran yang menyangkut. Saya bantu jadwalkan teknisinya ya."
         ],
         "expected_result": [
           "sering",
