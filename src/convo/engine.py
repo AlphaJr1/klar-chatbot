@@ -123,6 +123,19 @@ class ConversationEngine:
             "Jangan gunakan konteks atau percakapan dari pengguna lain.\n"
         )
 
+    def _get_customer_greeting(self, user_id: str) -> str:
+        identity = self.memstore.get_identity(user_id)
+        name = identity.get("greeting_name")
+        data_complete = self.memstore.get_flag(user_id, "data_collection_complete")
+        
+        if data_complete:
+            return "Kak"
+        
+        if name:
+            return f"Kak {name}"
+        
+        return "Kak"
+
     def detect_intent_via_llm(self, user_id: str, message: str, sop_intents: list[str]) -> Dict[str, Any]:
         message = self.text_normalizer.normalize_for_intent(message)
         
@@ -417,13 +430,31 @@ class ConversationEngine:
             return None
 
         greet_text = extracted.get("greeting_part") or "Halo"
-
-        prompt = f"""
-        Balas greeting berikut dengan sopan dan profesional.
-        Maksimal 1 kalimat.
-        Hindari kata 'Anda'.
-        Greeting pelanggan: "{greet_text}"
-        """
+        identity = self.memstore.get_identity(user_id)
+        has_greeting_name = bool(identity.get("greeting_name"))
+        history = self.memstore.get_history(user_id)
+        is_first_interaction = len(history) <= 1
+        
+        if not has_greeting_name and is_first_interaction:
+            prompt = f"""
+            Ini adalah pesan pertama dari customer dengan greeting: "{greet_text}"
+            
+            Balas greeting dengan sopan dan tanyakan nama customer.
+            Format: [balas greeting] + [tanya nama]
+            Maksimal 2 kalimat.
+            Hindari kata 'Anda'.
+            Gunakan bahasa yang ramah dan natural.
+            Contoh: "Halo, selamat pagi! Boleh tau nama kakak siapa?"
+            """
+        else:
+            customer_greeting = self._get_customer_greeting(user_id)
+            prompt = f"""
+            Balas greeting berikut dengan sopan dan profesional.
+            Maksimal 1 kalimat.
+            Hindari kata 'Anda'.
+            Gunakan sapaan: {customer_greeting}
+            Greeting pelanggan: "{greet_text}"
+            """
 
         system_msg = "Asisten CS Honeywell yang profesional."
         full_prompt = self._user_context_header(user_id) + prompt
@@ -440,7 +471,7 @@ class ConversationEngine:
             system=system_msg,
             prompt=full_prompt,
             response=reply,
-            meta={"greeting_part": greet_text},
+            meta={"greeting_part": greet_text, "has_greeting_name": has_greeting_name, "is_first": is_first_interaction},
         )
 
         today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -568,6 +599,8 @@ class ConversationEngine:
         complete = all([name, address, product])
         
         if complete:
+            self.memstore.set_flag(user_id, "data_collection_complete", True)
+            
             prompt = f"""
             Data pelanggan telah lengkap:
             - Nama: {name or '-'}
@@ -1262,6 +1295,140 @@ class ConversationEngine:
         
         return any(pattern in msg_lower for pattern in resolution_patterns)
     
+    def _is_ambiguous_positive(self, message: str) -> bool:
+        msg_lower = message.lower().strip()
+        words = msg_lower.split()
+        
+        if len(words) > 4:
+            return False
+        
+        ambiguous_words = ['iya', 'ya', 'sudah', 'udah', 'udh', 'dah', 'ok', 'oke', 'baik', 'sip', 'siap']
+        negative_indicators = ['tidak', 'belum', 'masih', 'ga', 'gak', 'nggak', 'ngga']
+        
+        if any(neg in msg_lower for neg in negative_indicators):
+            return False
+        
+        specific_indicators = [
+            'nyala', 'menyala', 'hidup', 'berfungsi', 'normal', 'jalan',
+            'lampu', 'indikator', 'kuning', 'berhasil', 'bisa'
+        ]
+        
+        if any(indicator in msg_lower for indicator in specific_indicators):
+            return False
+        
+        if len(words) <= 2:
+            return all(w in ambiguous_words for w in words)
+        
+        ambiguous_count = sum(1 for w in words if w in ambiguous_words)
+        return ambiguous_count / len(words) > 0.6
+    
+    def _generate_verification_question(self, user_id: str, intent: str, step_id: str) -> str:
+        verification_questions = {
+            "mati": {
+                "cek_tutup": [
+                    "Kak, apakah lampu indikator kuning pada unitnya sudah menyala?",
+                    "Boleh dicek kak, apakah ada lampu kuning yang nyala di unitnya?",
+                    "Setelah cover dipasang, apakah lampu kuning di unit sudah nyala?"
+                ],
+                "cek_remote_low": [
+                    "Apakah lampu indikator kuning di unitnya sudah menyala kak?",
+                    "Kak, setelah tekan LOW, apakah lampu kuning di unit sudah nyala dan ada hembusan udara?",
+                    "Boleh dicek, apakah lampu kuning di unitnya sudah menyala?"
+                ],
+                "cek_mcb": [
+                    "Apakah sekarang lampu indikator kuning di unitnya sudah menyala kak?",
+                    "Setelah MCB ON, apakah ada lampu kuning yang menyala di unitnya?",
+                    "Boleh dicek kak, apakah lampu kuning di unit sudah nyala?"
+                ]
+            },
+            "bunyi": {},
+            "bau": {}
+        }
+        
+        if intent in verification_questions and step_id in verification_questions[intent]:
+            questions = verification_questions[intent][step_id]
+            return random.choice(questions)
+        
+        default_questions = [
+            "Kak, untuk memastikan, apakah unitnya sekarang sudah berfungsi normal?",
+            "Boleh dipastikan sekali lagi kak, apakah alatnya sudah benar-benar berfungsi?",
+            "Untuk memastikan kak, apakah sekarang unitnya sudah bisa beroperasi normal?"
+        ]
+        return random.choice(default_questions)
+    
+    def _detect_self_correction(self, message: str) -> dict:
+        msg_lower = message.lower().strip()
+        
+        correction_patterns = [
+            'eh', 'eits', 'tunggu', 'wait', 'salah',
+            'maksud saya', 'maksudnya', 'bukan',
+            'tadi', 'sebelumnya',
+            'belom', 'belum', 'tidak', 'gak', 'ga', 'nggak', 'ngga',
+            'tidak jadi', 'batal', 'ralat'
+        ]
+        
+        immediate_correction = [
+            'eh belom', 'eh belum', 'eh tidak', 'eh ngga', 'eh gak',
+            'tunggu belom', 'tunggu belum', 'wait belom',
+            'eits belom', 'eits belum'
+        ]
+        
+        late_correction = [
+            'tadi belom', 'tadi belum', 'tadi tidak',
+            'sebelumnya belom', 'sebelumnya belum',
+            'yang tadi belom', 'yang tadi belum'
+        ]
+        
+        is_correction = False
+        correction_type = None
+        correction_value = None
+        
+        for pattern in immediate_correction:
+            if pattern in msg_lower:
+                is_correction = True
+                correction_type = 'immediate'
+                correction_value = 'no'
+                break
+        
+        if not is_correction:
+            for pattern in late_correction:
+                if pattern in msg_lower:
+                    is_correction = True
+                    correction_type = 'late'
+                    correction_value = 'no'
+                    break
+        
+        if not is_correction:
+            starts_with_correction = any(msg_lower.startswith(word) for word in ['eh', 'eits', 'tunggu', 'wait'])
+            if starts_with_correction:
+                negative_words = ['belom', 'belum', 'tidak', 'gak', 'ga', 'nggak', 'ngga']
+                if any(neg in msg_lower for neg in negative_words):
+                    is_correction = True
+                    correction_type = 'immediate'
+                    correction_value = 'no'
+        
+        return {
+            'is_correction': is_correction,
+            'type': correction_type,
+            'value': correction_value
+        }
+    
+    def _generate_correction_acknowledgment(self, user_id: str, intent: str, correction_type: str) -> str:
+        if correction_type == 'immediate':
+            responses = [
+                "Baik kak, saya catat belum ya.",
+                "Oke kak, berarti belum ya.",
+                "Siap kak, noted belum."
+            ]
+        else:
+            responses = [
+                "Oh baik kak, terima kasih koreksinya.",
+                "Oke kak, saya catat kembali ya.",
+                "Baik kak, saya update informasinya."
+            ]
+        
+        return random.choice(responses)
+    
     def _is_simple_acknowledge(self, message: str) -> bool:
         msg_lower = message.lower().strip()
         words = msg_lower.split()
@@ -1784,6 +1951,107 @@ class ConversationEngine:
         
         return 'unclear'
 
+    def _infer_from_ambiguous(self, message: str, expected_result: list, context: dict = None) -> dict:
+        """
+        Aggressive inference untuk ambiguous answers.
+        Return dict dengan inferred answer + confidence level.
+        """
+        msg_lower = message.lower().strip()
+        words = msg_lower.split()
+        
+        positive_hints = [
+            'mungkin', 'kayaknya', 'sepertinya', 'kali', 'harusnya',
+            'lumayan', 'agak', 'sedikit', 'cukup', 'iya sih', 'ya sih'
+        ]
+        
+        negative_hints = [
+            'gatau', 'ga tau', 'kurang', 'nggak yakin', 'belum tau',
+            'ragu', 'bingung', 'gimana ya', 'entah', 'sepertinya tidak'
+        ]
+        
+        frequency_strong = [
+            'terus-terusan', 'terus menerus', 'nonstop', 'always',
+            'setiap waktu', 'tiap hari', 'selalu', 'sangat sering'
+        ]
+        
+        frequency_mild = [
+            'kadang-kadang', 'kadang', 'sesekali', 'sometimes',
+            'occasionally', 'terkadang', 'kalau lagi', 'pas lagi'
+        ]
+        
+        if 'yes' in expected_result or 'no' in expected_result:
+            if any(hint in msg_lower for hint in positive_hints):
+                return {
+                    'answer': 'yes',
+                    'confidence': 'medium',
+                    'method': 'positive_hint',
+                    'original': message
+                }
+            
+            if any(hint in msg_lower for hint in negative_hints):
+                return {
+                    'answer': 'no',
+                    'confidence': 'medium',
+                    'method': 'negative_hint',
+                    'original': message
+                }
+            
+            if len(words) <= 3 and any(w in ['hmm', 'ehm', 'emm', 'um'] for w in words):
+                return {
+                    'answer': 'no',
+                    'confidence': 'low',
+                    'method': 'hesitation_assume_no',
+                    'original': message
+                }
+        
+        if 'sering' in expected_result and 'jarang' in expected_result:
+            if any(phrase in msg_lower for phrase in frequency_strong):
+                return {
+                    'answer': 'sering',
+                    'confidence': 'high',
+                    'method': 'frequency_strong',
+                    'original': message
+                }
+            
+            if any(phrase in msg_lower for phrase in frequency_mild):
+                return {
+                    'answer': 'jarang',
+                    'confidence': 'medium',
+                    'method': 'frequency_mild',
+                    'original': message
+                }
+            
+            if 'kadang' in msg_lower or 'sesekali' in msg_lower:
+                return {
+                    'answer': 'jarang',
+                    'confidence': 'medium',
+                    'method': 'frequency_occasional',
+                    'original': message
+                }
+            
+            return {
+                'answer': 'sering',
+                'confidence': 'low',
+                'method': 'frequency_default_safe',
+                'original': message,
+                'reason': 'Default sering karena safer untuk escalate'
+            }
+        
+        if expected_result:
+            return {
+                'answer': expected_result[0],
+                'confidence': 'low',
+                'method': 'default_first_option',
+                'original': message
+            }
+        
+        return {
+            'answer': 'unclear',
+            'confidence': 'none',
+            'method': 'no_inference',
+            'original': message
+        }
+
     def _is_step_already_asked(self, user_id: str, step_id: str, step_text: str) -> bool:
         
         history = self.memstore.get(user_id).get("history", [])
@@ -1802,6 +2070,19 @@ class ConversationEngine:
         return False
 
     def _llm_decide_next_action(self, user_id: str, message: str, sop_state: dict, intent: str) -> dict:
+        """
+        Hybrid Tiered Decision System:
+        Tier 1 (90%): Rule-based untuk kasus jelas
+        Tier 2 (8%): Aggressive inference untuk ambiguous
+        Tier 3 (2%): Safe escalate untuk edge cases
+        
+        Goal: ELIMINATE "clarify" fallback yang mengganggu
+        """
+        step_def = sop_state.get("step_def")
+        active_step = sop_state.get("active_step")
+        waiting_confirm = sop_state.get("waiting_confirm", False)
+        confirm_data = sop_state.get("confirm_data")
+        
         history = self.memstore.get_history(user_id)
         last_bot_msg = ""
         for h in reversed(history):
@@ -1810,143 +2091,226 @@ class ConversationEngine:
                 break
         
         step_already_asked = False
-        if sop_state["active_step"] and last_bot_msg:
-            step_text = sop_state["active_step"].get("step_text", "")
+        if active_step and last_bot_msg:
+            step_text = active_step.get("step_text", "")
             if step_text and step_text in last_bot_msg:
                 step_already_asked = True
         
-        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-        todays_messages = []
-        for h in history:
-            if h["ts"].startswith(today):
-                role = "Bot" if h["role"] == "bot" else "User"
-                todays_messages.append(f"{role}: {h['text']}")
-        history_block = "\\n".join(todays_messages) if todays_messages else "(Tidak ada percakapan hari ini)"
+        short_log(self.logger, user_id, "decide_hybrid", 
+                 f"waiting_confirm={waiting_confirm}, step_asked={step_already_asked}, step_def={' yes' if step_def else 'no'}")
         
-        system_msg = (
-            "Kamu adalah SOP Decision Engine untuk troubleshooting Honeywell. "
-            "Tugasmu adalah membaca SOP JSON dan menentukan action selanjutnya berdasarkan state saat ini. "
-            "Jawab HANYA JSON VALID. DILARANG menambah field atau mengubah format."
-        )
+        # TIER 1: RULE-BASED DECISIONS (High Confidence)
         
-        prompt = f"""
-        {self._user_context_header(user_id)}
+        # Case 1: Waiting for confirmation response
+        if waiting_confirm and confirm_data:
+            user_answer = self._parse_user_answer(message, ["yes", "no"])
+            
+            if user_answer != "unclear":
+                short_log(self.logger, user_id, "tier1_confirm", f"Answer: {user_answer}")
+                
+                branch = confirm_data.get("branch", {})
+                
+                if user_answer == "yes" and branch.get("resolve_if_yes"):
+                    return {
+                        "action": "resolve",
+                        "template_key": "resolve_templates",
+                        "user_answer": user_answer,
+                        "reason": "User confirm yes, resolve case",
+                        "tier": "1_rule"
+                    }
+                
+                if user_answer == "no":
+                    if branch.get("pending_if_no"):
+                        return {
+                            "action": "pending",
+                            "template_key": "pending_templates",
+                            "user_answer": user_answer,
+                            "reason": "User confirm no, escalate to teknisi",
+                            "tier": "1_rule"
+                        }
+                    
+                    next_step_id = branch.get("next_if_no")
+                    if next_step_id:
+                        return {
+                            "action": "next",
+                            "next_step_id": next_step_id,
+                            "user_answer": user_answer,
+                            "reason": "User confirm no, go to next step",
+                            "tier": "1_rule"
+                        }
+            else:
+                # Ambiguous confirm → try inference
+                inferred = self._infer_from_ambiguous(message, ["yes", "no"])
+                if inferred["confidence"] in ["high", "medium"]:
+                    short_log(self.logger, user_id, "tier2_infer_confirm", 
+                             f"Inferred: {inferred['answer']} ({inferred['confidence']})")
+                    
+                    user_answer = inferred["answer"]
+                    branch = confirm_data.get("branch", {})
+                    
+                    if user_answer == "yes" and branch.get("resolve_if_yes"):
+                        return {"action": "resolve", "template_key": "resolve_templates", 
+                               "user_answer": user_answer, "tier": "2_inference"}
+                    
+                    if user_answer == "no" and branch.get("pending_if_no"):
+                        return {"action": "pending", "template_key": "pending_templates",
+                               "user_answer": user_answer, "tier": "2_inference"}
+        
+        # Case 2: Step not asked yet → ASK
+        if step_def and not step_already_asked:
+            short_log(self.logger, user_id, "tier1_ask", "New step, ask question")
+            return {
+                "action": "ask",
+                "template_key": "ask_templates",
+                "user_answer": "na",
+                "reason": "Step not asked yet",
+                "tier": "1_rule"
+            }
+        
+        # Case 3: Step already asked → parse answer
+        if step_def and step_already_asked:
+            expected_result = step_def.get("expected_result", [])
+            user_answer = self._parse_user_answer(message, expected_result)
+            
+            # Rule-based clear answer
+            if user_answer != "unclear":
+                short_log(self.logger, user_id, "tier1_parsed", f"Answer: {user_answer}")
+                
+                logic_key = f"on_answer_{user_answer}"
+                logic = step_def.get("logic", {}).get(logic_key, {})
+                
+                action = self._logic_to_action(logic)
+                
+                return {
+                    "action": action,
+                    "template_key": self._get_template_key_from_action(action),
+                    "user_answer": user_answer,
+                    "next_step_id": logic.get("next"),
+                    "reason": f"Clear answer: {user_answer}",
+                    "tier": "1_rule"
+                }
+            
+            # TIER 2: AGGRESSIVE INFERENCE for ambiguous
+            inferred = self._infer_from_ambiguous(message, expected_result)
+            
+            if inferred["confidence"] in ["high", "medium"]:
+                short_log(self.logger, user_id, "tier2_infer", 
+                         f"Inferred: {inferred['answer']} (confidence: {inferred['confidence']}, method: {inferred['method']})")
+                
+                user_answer = inferred["answer"]
+                logic_key = f"on_answer_{user_answer}"
+                logic = step_def.get("logic", {}).get(logic_key, {})
+                
+                action = self._logic_to_action(logic)
+                
+                return {
+                    "action": action,
+                    "template_key": self._get_template_key_from_action(action),
+                    "user_answer": user_answer,
+                    "next_step_id": logic.get("next"),
+                    "reason": f"Inferred: {user_answer} via {inferred['method']}",
+                    "tier": "2_inference",
+                    "inferred": True
+                }
+            
+            # TIER 3: Still unclear → ESCALATE (tidak clarify!)
+            clarify_count = self.memstore.get_flag(user_id, f"{intent}_clarify_count") or 0
+            
+            # Allow HANYA 1x clarify untuk critical step dengan serious attempt
+            is_critical = active_step and active_step.get("order", 0) >= 2
+            is_serious = len(message.split()) > 5
+            
+            if clarify_count == 0 and is_critical and is_serious:
+                short_log(self.logger, user_id, "tier3_clarify_once", 
+                         "Allow 1x clarify for critical serious attempt")
+                
+                self.memstore.set_flag(user_id, f"{intent}_clarify_count", 1)
+                
+                return {
+                    "action": "clarify",
+                    "user_answer": "unclear",
+                    "reason": "First unclear on critical step",
+                    "tier": "3_llm_edge"
+                }
+            
+            # Default: ESCALATE to pending (safer than clarify)
+            short_log(self.logger, user_id, "tier3_auto_pending", 
+                     f"Unclear after inference, escalate (clarify_count={clarify_count})")
+            
+            return {
+                "action": "pending",
+                "template_key": "pending_templates",
+                "user_answer": "unclear",
+                "reason": "Ambiguous answer, escalate to teknisi for safety",
+                "tier": "3_safe_escalate"
+            }
+        
+        # Case 4: No step def (completed) → resolve or pending
+        if not step_def:
+            short_log(self.logger, user_id, "tier1_no_step", "All steps done")
+            
+            last_step_result = sop_state.get("last_step_result", "no")
+            
+            if last_step_result == "yes":
+                return {
+                    "action": "resolve",
+                    "template_key": "resolve_templates",
+                    "user_answer": last_step_result,
+                    "reason": "All steps done, last result positive",
+                    "tier": "1_rule"
+                }
+            else:
+                return {
+                    "action": "pending",
+                    "template_key": "pending_templates",
+                    "user_answer": last_step_result,
+                    "reason":  "All steps done, need teknisi",
+                    "tier": "1_rule"
+                }
+        
+        # Fallback safety
+        short_log(self.logger, user_id, "tier3_fallback", "Unexpected case, default pending")
+        return {
+            "action": "pending",
+            "template_key": "pending_templates",
+            "user_answer": "unclear",
+            "reason": "Unexpected state, safe escalate",
+            "tier": "3_fallback"
+        }
+    
+    def _logic_to_action(self, logic: dict) -> str:
+        """Convert SOP logic dict ke action"""
+        if logic.get("instruct"):
+            return "instruct"
+        if logic.get("confirm"):
+            return "confirm"
+        if logic.get("offer"):
+            return "offer"
+        if logic.get("resolve"):
+            return "resolve"
+        if logic.get("pending"):
+            return "pending"
+        if logic.get("next"):
+            return "next"
+        return "clarify"
+    
+    def _get_template_key_from_action(self, action: str) -> str:
+        """Get template key from action"""
+        template_map = {
+            "ask": "ask_templates",
+            "instruct": "instruct_templates",
+            "confirm": "confirm_templates",
+            "offer": "offer_templates",
+            "resolve": "resolve_templates",
+            "pending": "pending_templates"
+        }
+        return template_map.get(action)
 
-        RIWAYAT PERCAKAPAN HARI INI:
-        {history_block}
-
-        PESAN TERAKHIR BOT:
-        "{last_bot_msg}"
-
-        PESAN USER SAAT INI:
-        "{message}"
-
-        ===== SOP STATE =====
-        Intent: {sop_state["intent"]}
-        
-        Active Step:
-        {json.dumps(sop_state["active_step"], ensure_ascii=False, indent=2)}
-        
-        Step Already Asked: {"YA - step ini sudah ditanyakan ke user" if step_already_asked else "TIDAK - step ini belum ditanyakan"}
-        
-        Step Definition (lengkap dengan logic):
-        {json.dumps(sop_state["step_def"], ensure_ascii=False, indent=2) if sop_state["step_def"] else "null"}
-        
-        Completed Steps: {sop_state["completed_steps"]}
-        
-        Step Answers (jawaban user di step sebelumnya):
-        {json.dumps(sop_state["step_answers"], ensure_ascii=False, indent=2)}
-        
-        Flags:
-        {json.dumps(sop_state["flags"], ensure_ascii=False, indent=2)}
-        
-        Waiting Confirm: {sop_state["waiting_confirm"]}
-        Confirm Data: {json.dumps(sop_state["confirm_data"], ensure_ascii=False, indent=2) if sop_state["confirm_data"] else "null"}
-        
-        Metadata Templates:
-        {json.dumps(sop_state["metadata"], ensure_ascii=False, indent=2)}
-        
-        ===== CONSTRAINT KETAT =====
-        1. HARUS mengikuti "logic" dari step_def
-        2. TIDAK BOLEH skip step atau membuat keputusan di luar SOP
-        3. HARUS mempertimbangkan "expected_result" dan "on_answer_*" logic
-        4. Jika waiting_confirm=true, ini adalah jawaban konfirmasi dari user
-        5. Jika step_def null, berarti semua step selesai → pending atau resolve
-        6. Parse jawaban user berdasarkan expected_result di step_def
-        7. Jika "Step Already Asked" = YA, berarti user sedang menjawab pertanyaan step ini
-        
-        ===== DECISION LOGIC =====
-        
-        A. Jika waiting_confirm=true:
-           - Parse jawaban user (yes/no)
-           - Ikuti logic dari confirm_data["branch"]
-           - Jika resolve_if_yes=true dan user jawab yes → action="resolve"
-           - Jika next_if_no ada dan user jawab no → action="next", next_step_id=<id>
-           - Jika pending_if_no=true dan user jawab no → action="pending"
-        
-        B. Jika step_def tidak null dan "Step Already Asked" = TIDAK:
-           - action="ask"
-           - template_key="ask_templates"
-        
-        C. Jika step_def tidak null dan "Step Already Asked" = YA:
-           - Parse jawaban user berdasarkan expected_result
-           - Jika jawaban unclear → action="clarify"
-           - Ambil logic berdasarkan jawaban: on_answer_yes / on_answer_no / on_answer_sering / on_answer_jarang
-           - Jika logic["instruct"]=true → action="instruct", template_key="instruct_templates"
-           - Jika logic["confirm"]=true → action="confirm", template_key="confirm_templates"
-           - Jika logic["offer"]=true → action="offer", template_key="offer_templates"
-           - Jika logic["resolve"]=true → action="resolve", template_key="resolve_templates"
-           - Jika logic["pending"]=true → action="pending", template_key="pending_templates"
-           - Jika logic["next"] ada → action="next", next_step_id=<id>
-        
-        D. Jika step_def null (semua step selesai):
-           - Cek last_step_result
-           - Jika last_step_result="yes" → action="resolve"
-           - Jika last_step_result="no" atau "sering" → action="pending"
-        
-        ===== OUTPUT FORMAT =====
-        Kembalikan HANYA JSON:
-        {{
-          "action": "ask/confirm/instruct/resolve/pending/next/clarify/offer",
-          "template_key": "ask_templates/confirm_templates/instruct_templates/resolve_templates/pending_templates/offer_templates/null",
-          "next_step_id": "<step_id jika action=next, atau null>",
-          "user_answer": "<parsed answer: yes/no/sering/jarang/unclear>",
-          "reason": "<penjelasan singkat kenapa memilih action ini>"
-        }}
-        
-        PENTING: 
-        - Jangan buat keputusan sendiri, ikuti SOP logic dengan ketat
-        - Jika "Step Already Asked" = YA, berarti user sedang menjawab, JANGAN ask lagi
-        - Pastikan template_key sesuai dengan yang ada di step_def
-        """
-        
-        out = self.ollama.generate_json(system=system_msg, prompt=prompt) or {}
-        
-        self._log_llm_call(
-            func="_llm_decide_next_action",
-            user_id=user_id,
-            call_type="generate_json",
-            system=system_msg,
-            prompt=prompt,
-            response=out,
-            meta={
-                "intent": intent,
-                "active_step_id": sop_state["active_step"]["step_id"] if sop_state["active_step"] else None,
-                "waiting_confirm": sop_state["waiting_confirm"],
-                "step_already_asked": step_already_asked,
-            },
-        )
-        
-        out.setdefault("action", "clarify")
-        out.setdefault("template_key", None)
-        out.setdefault("next_step_id", None)
-        out.setdefault("user_answer", "unclear")
-        out.setdefault("reason", "")
-        
-        return out
 
     def _naturalize_template(self, user_id: str, template_text: str, action_type: str) -> str:
         import re
+        
+        customer_greeting = self._get_customer_greeting(user_id)
         
         simple_patterns = [
             r'^Kak,\s+(bunyinya\s+)?sering\s+atau\s+jarang\??\s*$',
@@ -1961,6 +2325,7 @@ class ConversationEngine:
                 simple_transform = re.sub(r'\bsilakan\b', 'coba', simple_transform, flags=re.IGNORECASE)
                 simple_transform = re.sub(r'\bmohon\b', 'tolong', simple_transform, flags=re.IGNORECASE)
                 simple_transform = re.sub(r'^Apakah\s+', 'Kak, ', simple_transform)
+                simple_transform = re.sub(r'\bKak\b', customer_greeting, simple_transform)
                 short_log(self.logger, user_id, "skip_naturalize", f"Template sudah sederhana: {template_text[:50]}")
                 return simple_transform
         
@@ -1986,7 +2351,7 @@ class ConversationEngine:
         4. Gunakan bahasa Indonesia yang baik dan benar - JANGAN gunakan bahasa asing
         5. DILARANG gunakan bahasa gaul: "dong", "aja", "gitu", "sih", "gimana", "ngga", "nggak", "gak", "ga"
         6. DILARANG gunakan kata serapan salah: "teknisian" (gunakan "teknisi")
-        7. Gunakan "kak" untuk sapaan
+        7. Gunakan "{customer_greeting}" untuk sapaan (ganti semua "kak" dengan ini)
         8. Tidak gunakan kata "Anda"
         9. Hindari tanda kutip
         10. Jangan bertele-tele tapi jangan hilangkan informasi penting
@@ -2485,19 +2850,80 @@ class ConversationEngine:
             expected_result = step_def.get("expected_result", [])
             user_answer = self._parse_user_answer(message, expected_result)
         
+        correction_check = self._detect_self_correction(message)
+        if correction_check['is_correction'] and active_step and step_def:
+            short_log(self.logger, user_id, "self_correction_detected", 
+                     f"Type: {correction_check['type']}, Message: {message[:50]}")
+            
+            correction_ack = self._generate_correction_acknowledgment(user_id, intent, correction_check['type'])
+            self.memstore.append_history(user_id, "bot", correction_ack)
+            
+            corrected_value = correction_check['value']
+            if corrected_value:
+                self.memstore.set_flag(user_id, f"{active_step['step_id']}_answer", corrected_value)
+            
+            self.memstore.clear_flag(user_id, f"{active_step['step_id']}_waiting_confirm")
+            self.memstore.clear_flag(user_id, f"{active_step['step_id']}_verification_count")
+            
+            logic = step_def.get("logic", {})
+            logic_key = f"on_answer_{corrected_value}"
+            corrected_logic = logic.get(logic_key, {})
+            
+            if corrected_logic.get("next"):
+                next_step_id = corrected_logic["next"]
+                self.memstore.set_flag(user_id, f"{intent}_active_step", next_step_id)
+                
+                next_step = next((s for s in sop[intent]["steps"] if s["id"] == next_step_id), None)
+                if next_step:
+                    ask_list = next_step.get("ask_templates", [])
+                    ask_msg = self._naturalize_template(user_id, random.choice(ask_list) if ask_list else "Boleh kami cek kondisi alatnya kak?", "ask")
+                    combined_msg = f"{correction_ack} {ask_msg}"
+                    self.memstore.append_history(user_id, "bot", ask_msg)
+                    return {"bubbles": [{"text": combined_msg}], "next": "await_reply"}
+            
+            elif corrected_logic.get("pending"):
+                pending_list = step_def.get("pending_templates", [])
+                pending_msg = self._naturalize_template(user_id, random.choice(pending_list) if pending_list else "Baik kak, saya teruskan ke teknisi ya.", "pending")
+                self.memstore.set_flag(user_id, "sop_pending", True)
+                combined_msg = f"{correction_ack} {pending_msg}"
+                self.memstore.append_history(user_id, "bot", pending_msg)
+                name_question = self.data_collector.generate_question(user_id, "name")
+                self.memstore.append_history(user_id, "bot", name_question)
+                return {"bubbles": [{"text": combined_msg}, {"text": name_question}], "next": "await_reply", "status": "open"}
+            
+            else:
+                return {"bubbles": [{"text": correction_ack}], "next": "await_reply"}
+        
         if waiting_confirm and confirm_data:
             user_answer_confirm = self._parse_user_answer(message, ['yes', 'no'])
             
             if user_answer_confirm == 'yes':
+                verification_count = self.memstore.get_flag(user_id, f"{active_step['step_id']}_verification_count") or 0
+                
+                if self._is_ambiguous_positive(message) and verification_count == 0:
+                    short_log(self.logger, user_id, "ambiguous_answer_detected", 
+                             f"Customer jawab '{message}' - perlu verifikasi lebih lanjut")
+                    
+                    self.memstore.set_flag(user_id, f"{active_step['step_id']}_verification_count", 1)
+                    
+                    verify_question = self._generate_verification_question(user_id, intent, active_step['step_id'])
+                    self.memstore.append_history(user_id, "bot", verify_question)
+                    
+                    return {"bubbles": [{"text": verify_question}], "next": "await_reply"}
+                
                 if confirm_data.get("resolve_if_yes"):
-                    if not self._is_explicit_resolution(message):
+                    if not self._is_explicit_resolution(message) and verification_count == 0:
                         short_log(self.logger, user_id, "prevent_premature_resolve_confirm", 
                                  f"User jawab yes tapi tidak ada konfirmasi eksplisit")
+                        
+                        self.memstore.set_flag(user_id, f"{active_step['step_id']}_verification_count", 1)
                         
                         clarify_msg = "Jadi alatnya sudah berfungsi normal kak?"
                         self.memstore.append_history(user_id, "bot", clarify_msg)
                         
                         return {"bubbles": [{"text": clarify_msg}], "next": "await_reply"}
+                    
+                    self.memstore.clear_flag(user_id, f"{active_step['step_id']}_verification_count")
                     
                     resolve_list = step_def.get("resolve_templates", [])
                     resolve_template = random.choice(resolve_list) if resolve_list else "Baik kak, saya tutup laporannya ya."
@@ -2510,6 +2936,8 @@ class ConversationEngine:
                     return {"bubbles": [{"text": resolve_msg}], "next": "end", "status": "resolved"}
             
             elif user_answer_confirm == 'no':
+                self.memstore.clear_flag(user_id, f"{active_step['step_id']}_verification_count")
+                
                 if confirm_data.get("next_if_no"):
                     next_step_id = confirm_data["next_if_no"]
                     self.memstore.set_flag(user_id, f"{active_step['step_id']}_waiting_confirm", False)
@@ -2644,9 +3072,31 @@ class ConversationEngine:
             return {"bubbles": [{"text": confirm_msg}], "next": "await_reply"}
         
         if logic.get("resolve"):
-            if not self._is_explicit_resolution(message):
+            verification_count = self.memstore.get_flag(user_id, f"{active_step['step_id']}_verification_count") or 0
+            
+            if self._is_ambiguous_positive(message) and verification_count == 0:
+                short_log(self.logger, user_id, "ambiguous_positive_before_resolve", 
+                         f"Jawaban ambiguous '{message}' - tanya detail sebelum resolve")
+                
+                self.memstore.set_flag(user_id, f"{active_step['step_id']}_verification_count", 1)
+                
+                verify_question = self._generate_verification_question(user_id, intent, active_step['step_id'])
+                self.memstore.append_history(user_id, "bot", verify_question)
+                
+                self.memstore.set_flag(user_id, f"{active_step['step_id']}_waiting_confirm", True)
+                self.memstore.set_flag(user_id, f"{active_step['step_id']}_confirm_data", {
+                    "resolve_if_yes": True,
+                    "next_if_no": None,
+                    "pending_if_no": True
+                })
+                
+                return {"bubbles": [{"text": verify_question}], "next": "await_reply"}
+            
+            if not self._is_explicit_resolution(message) and verification_count == 0:
                 short_log(self.logger, user_id, "prevent_premature_resolve_logic", 
                          f"SOP logic want resolve but no explicit confirmation")
+                
+                self.memstore.set_flag(user_id, f"{active_step['step_id']}_verification_count", 1)
                 
                 confirm_msg = "Apakah alatnya sudah berfungsi normal kak?"
                 self.memstore.append_history(user_id, "bot", confirm_msg)
@@ -2659,6 +3109,8 @@ class ConversationEngine:
                 })
                 
                 return {"bubbles": [{"text": confirm_msg}], "next": "await_reply"}
+            
+            self.memstore.clear_flag(user_id, f"{active_step['step_id']}_verification_count")
             
             resolve_list = step_def.get("resolve_templates", [])
             resolve_template = random.choice(resolve_list) if resolve_list else "Baik kak, saya tutup laporannya ya."
@@ -3076,20 +3528,7 @@ class ConversationEngine:
                             "status": "pending"
                         }, {"context": "pending_complete_simple_ack"})
                 
-                identity = self.memstore.get_identity(user_id)
-                name = identity.get("name", "Kak")
-                gender = identity.get("gender")
-                is_company = identity.get("is_company", False)
-                salutation = "Pak" if gender == "male" else "Bu" if gender == "female" else "Kak"
-                
-                if is_company:
-                    greeting_name = name
-                elif name and name != "Kak":
-                    greeting_name = f"{salutation} {name}"
-                else:
-                    greeting_name = salutation
-                
-                closing_msg = f"Data {greeting_name} sudah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan."
+                closing_msg = "Data sudah kami terima. Teknisi kami akan segera menghubungi untuk konfirmasi jadwal kunjungan."
                 
                 self.memstore.append_history(user_id, "bot", closing_msg)
                 self.memstore.set_flag(user_id, "pending_closing_sent", True)
@@ -3151,6 +3590,46 @@ class ConversationEngine:
             reply = self.handle_greeting(user_id, greeting_part, {"should_reply_greeting": True})
             return self._log_and_return(user_id, {"bubbles": [{"text": reply}], "next": "await_reply"}, {"context": "greeting_only"})
 
+        identity = self.memstore.get_identity(user_id)
+        has_greeting_name = bool(identity.get("greeting_name"))
+        history = self.memstore.get_history(user_id)
+        
+        if not has_greeting_name and len(history) >= 2:
+            last_bot_msg = None
+            for h in reversed(history):
+                if h["role"] == "bot":
+                    last_bot_msg = h["text"]
+                    break
+            
+            if last_bot_msg and any(keyword in last_bot_msg.lower() for keyword in ["nama", "siapa"]):
+                msg_words = msg.split()
+                if len(msg_words) <= 4:
+                    detect_name_prompt = f"""
+                    Pesan bot terakhir: "{last_bot_msg}"
+                    Pesan customer: "{msg}"
+                    
+                    Apakah customer menjawab dengan nama mereka?
+                    Jika ya, ekstrak nama (hanya nama depan atau nama yang disebutkan).
+                    
+                    Return JSON:
+                    {{
+                      "is_name": true/false,
+                      "name": "<nama jika ada>"
+                    }}
+                    """
+                    
+                    detected = self.ollama.generate_json(
+                        system="Detektor nama customer. Jawab HANYA JSON valid.",
+                        prompt=detect_name_prompt
+                    ) or {}
+                    
+                    if detected.get("is_name") and detected.get("name"):
+                        name_value = detected.get("name", "").strip()
+                        if name_value and len(name_value) < 30:
+                            self.memstore.update(user_id, {"greeting_name": name_value})
+                            short_log(self.logger, user_id, "greeting_name_captured", 
+                                     f"Name: {name_value}")
+        
         greeting_reply = None
         if has_greeting:
             today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -3170,6 +3649,37 @@ class ConversationEngine:
             
             if pending_just_triggered:
                 self.memstore.clear_flag(user_id, "pending_just_triggered")
+                
+                if active_intent and active_intent != "none":
+                    python_additional = self._detect_additional_complaint_python(msg, active_intent)
+                    
+                    if python_additional == "none" and additional_complaint != "none":
+                        python_additional = additional_complaint
+                    
+                    if python_additional != "none":
+                        self._queue_additional_complaint(user_id, python_additional)
+                        
+                        complaint_names = {
+                            "mati": "tidak menyala",
+                            "bunyi": "bunyi tidak normal", 
+                            "bau": "bau tidak sedap"
+                        }
+                        complaint_text = complaint_names.get(python_additional, python_additional)
+                        
+                        short_log(self.logger, user_id, "additional_complaint_after_pending_trigger", 
+                                 f"Additional complaint '{python_additional}' detected right after pending triggered")
+                        
+                        ack_msg = f"Baik Kak, keluhan '{complaint_text}' juga sudah saya catat."
+                        self.memstore.append_history(user_id, "bot", ack_msg)
+                        
+                        name_question = self.data_collector.generate_question(user_id, "name")
+                        self.memstore.append_history(user_id, "bot", name_question)
+                        
+                        return self._log_and_return(user_id, {
+                            "bubbles": [{"text": ack_msg}, {"text": name_question}], 
+                            "next": "await_reply", 
+                            "status": "open"
+                        }, {"context": "pending_just_triggered_with_additional", "queued": python_additional})
                 
                 name_question = self.data_collector.generate_question(user_id, "name")
                 self.memstore.append_history(user_id, "bot", name_question)

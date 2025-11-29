@@ -36,9 +36,14 @@ class ConversationDB:
                 with open(self.db_path, "r", encoding="utf-8") as f:
                     content = f.read()
                     data = json.loads(content)
+                    
+                    if not isinstance(data, dict) or "conversations" not in data:
+                        print(f"[DB] ❌ Invalid structure in {self.db_path}")
+                        raise ValueError("Invalid database structure")
+                    
                     return data
-            except json.JSONDecodeError as e:
-                print(f"[DB] ❌ JSON error in {self.db_path}: {e}")
+            except (json.JSONDecodeError, ValueError) as e:
+                print(f"[DB] ❌ Error in {self.db_path}: {e}")
                 backup_path = f"{self.db_path}.corrupted.backup"
                 import shutil
                 shutil.copy(self.db_path, backup_path)
