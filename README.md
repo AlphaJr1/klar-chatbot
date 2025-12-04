@@ -13,7 +13,7 @@ Intelligent conversation engine untuk Honeywell Electronic Air Cleaner customer 
 python --version  # pastikan >= 3.10
 ```
 
-### 2. Ollama & Qwen2.5:7B-Instruct
+### 2. Ollama & Qwen3:4B-Instruct
 
 **Install Ollama:**
 
@@ -34,14 +34,14 @@ curl -fsSL https://ollama.com/install.sh | sh
 ollama serve
 ```
 
-**Download dan Test Qwen2.5:7B-Instruct:**
+**Download dan Test Qwen3:4B-Instruct:**
 
 ```bash
-# Download model (sekitar 4.7GB)
-ollama pull qwen2.5:7b-instruct
+# Download model (sekitar 2.5GB)
+ollama pull qwen3:4B-instruct
 
 # Test model
-ollama run qwen2.5:7b-instruct "Hello, how are you?"
+ollama run qwen3:4B-instruct "Halo, apa kabar?"
 ```
 
 Pastikan Ollama berjalan di `http://localhost:11434` (default port)
@@ -225,7 +225,7 @@ ollama serve
 ollama list
 
 # Re-pull model jika perlu
-ollama pull qwen2.5:7b-instruct
+ollama pull qwen3:4B-instruct
 ```
 
 ### Port Already in Use
@@ -307,7 +307,7 @@ python scripts/clear_memory.py
 - **Memory Management:** Persistent user state dengan backup otomatis
 - **Session Logging:** Comprehensive logging untuk debugging
 - **RAG Integration:** Vector-based knowledge retrieval
-- **LLM-Powered:** Natural language understanding menggunakan Qwen2.5
+- **LLM-Powered:** Natural language understanding menggunakan Qwen3
 - **Spam Filter:** Deteksi spam dan irrelevant messages
 - **Intent Detection:** Smart intent detection untuk better UX
 

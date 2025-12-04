@@ -23,7 +23,7 @@ class Retriever:
         self.e5 = SentenceTransformer(E5_PATH)
         self.bge = SentenceTransformer(BGE_PATH)
 
-        self.llm = OllamaClient(model="qwen2.5:7b-instruct")
+        self.llm = OllamaClient(model="qwen3:4B-instruct")
 
         self._connect_qdrant()
 

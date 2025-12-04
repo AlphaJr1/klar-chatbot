@@ -498,16 +498,17 @@ class DataCollector:
             salutation = "Kak"
         
         if field == "name":
-            return f"Baik {salutation}, boleh tahu kemarin pembeliannya atas nama siapa?"
+            return f"Boleh tahu kemarin pembeliannya atas nama siapa {salutation}?"
         
         elif field == "product":
-            return f"Baik {salutation}, untuk produknya F57A atau F90A?"
+            return f"Untuk produknya F57A atau F90A {salutation}?"
         
         elif field == "address":
-            return f"Baik {salutation}, boleh info alamat lengkapnya? Supaya kami bisa pastikan lokasinya."
+            return f"Boleh info alamat lengkapnya {salutation}?"
         
         else:
-            return f"Maaf {salutation}, ada yang bisa saya bantu?"
+            return f"Ada yang bisa saya bantu {salutation}?"
+
 
     
     def generate_incomplete_address_message(self, user_id: str, missing_info: list) -> str:

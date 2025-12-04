@@ -700,7 +700,8 @@ class ConversationEngine:
             "nyala", "hidup", "jalan", "berfungsi", "normal", "lancar",
             "oke", "ok", "okay", "oki", "okeh",
             "baik", "bagus", "mantap", "sip", "siap", "iya dong",
-            "setuju", "bisa", "tentu", "pastilah", "iyap"
+            "setuju", "bisa", "tentu", "pastilah", "iyap", "done", "selesai",
+            "udh coba", "udah coba", "sudah dicoba", "sudah dilakukan"
         ]
         
         negative_keywords = [
@@ -709,11 +710,29 @@ class ConversationEngine:
             "belum", "blm", "blum",
             "mati", "rusak", "gak nyala", "gak hidup", "gak jalan",
             "no", "nggk", "nda", "ndak",
-            "bukan", "ngak", "teu", "ente"
+            "bukan", "ngak", "teu", "ente", "masih mati", "masih rusak"
         ]
         
         sering_keywords = ["sering", "sering banget", "kadang", "kadang-kadang", "sometimes", "occasionally", "lumayan sering", "kerap"]
         jarang_keywords = ["jarang", "jarang banget", "rarely", "sesekali", "hampir tidak", "jarang sekali", "sangat jarang"]
+        
+        contradiction_markers = ["tapi", "tetapi", "namun", "cuma", "tp", "akan tetapi", "hanya saja"]
+        problem_indicators = ["ga", "gak", "tidak", "belum", "mati", "rusak", "gak nyala", "masih"]
+        
+        has_contradiction = any(marker in msg_lower for marker in contradiction_markers)
+        if has_contradiction:
+            contradiction_idx = -1
+            for marker in contradiction_markers:
+                if marker in msg_lower:
+                    contradiction_idx = msg_lower.find(marker)
+                    break
+            
+            if contradiction_idx > 0:
+                after_contradiction = msg_lower[contradiction_idx:]
+                if any(prob in after_contradiction for prob in problem_indicators):
+                    short_log(self.logger, user_id, "parse_contradiction_override", 
+                             f"Detected 'X tapi Y' pattern -> NO")
+                    return "no"
         
         if len(words) == 1:
             if msg_lower in positive_keywords:
@@ -725,7 +744,7 @@ class ConversationEngine:
             if msg_lower in jarang_keywords:
                 return "jarang"
         
-        if len(words) <= 3:
+        if len(words) <= 5:
             has_positive = sum(1 for kw in positive_keywords if kw in msg_lower)
             has_negative = sum(1 for kw in negative_keywords if kw in msg_lower)
             has_sering = any(kw in msg_lower for kw in sering_keywords)
@@ -735,6 +754,9 @@ class ConversationEngine:
                 return "sering"
             if has_jarang and "jarang" in expected_results:
                 return "jarang"
+            
+            if has_negative > 0 and not has_contradiction:
+                return "no"
             
             if has_positive > has_negative and has_positive > 0:
                 return "yes"
@@ -746,14 +768,14 @@ class ConversationEngine:
                     return "yes"
                 return "no"
         
-        if len(words) <= 5:
+        if len(words) <= 8:
             strong_positive_phrases = [
                 "iya", "sudah", "udah", "ya sudah", "ya udah", "oke deh", 
-                "siap", "bisa", "ok siap", "iya bisa"
+                "siap", "bisa", "ok siap", "iya bisa", "sudah dicoba", "udah coba"
             ]
             strong_negative_phrases = [
                 "tidak", "belum", "ga", "gak", "nggak", "ngga",
-                "belum nih", "ga bisa", "gak bisa", "masih mati"
+                "belum nih", "ga bisa", "gak bisa", "masih mati", "masih ga", "masih gak"
             ]
             
             for phrase in strong_positive_phrases:
@@ -781,13 +803,17 @@ class ConversationEngine:
         Expected results: {expected_results}
         
         Klasifikasikan jawaban ke salah satu kategori:
-        - "yes" jika jawaban POSITIF (iya, ya, sudah, udah, udh, betul, benar, nyala, oke, ok, baik, dll)
-        - "no" jika jawaban NEGATIF (tidak, belum, blm, ga, gak, nggak, ngga, mati, enggak, dll)
+        - "yes" jika jawaban POSITIF (iya, ya, sudah, udah, betul, nyala, oke, dll)
+        - "no" jika jawaban NEGATIF (tidak, belum, ga, gak, mati, dll)
         - "sering" jika menunjukkan frekuensi TINGGI
         - "jarang" jika menunjukkan frekuensi RENDAH
-        - "unclear" jika benar-benar tidak jelas atau ambigu
+        - "unclear" hanya jika BENAR-BENAR tidak ada petunjuk sama sekali
         
-        PENTING: Jangan terlalu strict. Jika ada indikasi yes/no, classify sebagai yes/no.
+        CRITICAL RULES:
+        1. KONTRADIKSI: Jika ada kata "tapi", "tetapi", "namun", "cuma" diikuti masalah (ga/gak/tidak/mati/belum) → classify sebagai "no"
+           Contoh: "sudah ditutup tapi masih ga nyala" → "no" (bukan "yes")
+        2. AGGRESSIVE INFERENCE: Prefer yes/no daripada unclear. Jika ada keyword positif/negatif, gunakan itu.
+        3. Jangan terlalu strict pada grammar atau struktur kalimat.
         
         Return HANYA JSON:
         {{
@@ -1084,6 +1110,17 @@ class ConversationEngine:
         return "unclear"
     
     def _generate_distraction_response(self, user_id: str, message: str, dtype: str, follow_up: str) -> str:
+        sop_pending = self.memstore.get_flag(user_id, "sop_pending")
+        
+        if sop_pending:
+            identity = self.memstore.get_identity(user_id)
+            name = identity.get("name")
+            product = identity.get("product")
+            address = identity.get("address")
+            
+            if not all([name, product, address]):
+                return follow_up
+        
         if dtype == "competitor":
             competitor_info = self._detect_competitor_mention(message)
             brand = competitor_info.get("brand", "produk lain")
@@ -1105,7 +1142,7 @@ class ConversationEngine:
                 response = "Garansi produk Honeywell 1 tahun kak"
             else:
                 response = "Nanti kami bantu infokan kak"
-            return f"{response}. Balik ke EAC nya ya, {follow_up.lower()}"
+            return f"{response}. {follow_up}"
         
         elif dtype == "chitchat":
             msg_lower = message.lower()
@@ -1117,7 +1154,7 @@ class ConversationEngine:
                 response = "Baik kak"
             else:
                 response = "Oke kak"
-            return f"{response}. Oh iya, {follow_up.lower()}"
+            return f"{response}. {follow_up}"
         
         return follow_up
     
@@ -1152,8 +1189,8 @@ class ConversationEngine:
         3. Lanjutkan dengan pertanyaan troubleshoot
         
         Contoh bagus:
-        - "Baik kak, saya catat juga ada bunyi. Tapi kita selesaikan yang tidak menyala dulu ya? {troubleshoot_question.lower()}"
-        - "Oke kak, untuk bau nya saya catat. Kita fokus dulu ke yang mati ya? {troubleshoot_question.lower()}"
+        - "Noted kak untuk bunyi nya. Tapi kita selesaikan yang tidak menyala dulu ya? {troubleshoot_question.lower()}"
+        - "Oke kak, untuk bau nya nanti kita selesaikan. Kita fokus dulu ke yang mati ya? {troubleshoot_question.lower()}"
         
         PENTING:
         - Maksimal 2 kalimat
@@ -1416,8 +1453,8 @@ class ConversationEngine:
     def _generate_correction_acknowledgment(self, user_id: str, intent: str, correction_type: str) -> str:
         if correction_type == 'immediate':
             responses = [
-                "Baik kak, saya catat belum ya.",
-                "Oke kak, berarti belum ya.",
+                "Noted kak.",
+                "Oke kak.",
                 "Siap kak, noted belum."
             ]
         else:
@@ -2522,9 +2559,9 @@ class ConversationEngine:
             clarify_count += 1
             self.memstore.set_flag(user_id, f"{intent}_clarify_count", clarify_count)
             
-            short_log(self.logger, user_id, "clarify_count", f"Intent: {intent}, Count: {clarify_count}/3")
+            short_log(self.logger, user_id, "clarify_count", f"Intent: {intent}, Count: {clarify_count}/2")
             
-            if clarify_count >= 3:
+            if clarify_count >= 2:
                 self.memstore.set_flag(user_id, f"{intent}_clarify_count", 0)
                 
                 escalate_msg = "Baik kak, sepertinya perlu pengecekan lebih detail oleh teknisi kami. Boleh saya bantu jadwalkan kunjungan teknisi?"
@@ -3013,9 +3050,9 @@ class ConversationEngine:
             clarify_count += 1
             self.memstore.set_flag(user_id, f"{intent}_clarify_count", clarify_count)
             
-            short_log(self.logger, user_id, "clarify_count_exploration", f"Intent: {intent}, Count: {clarify_count}/3")
+            short_log(self.logger, user_id, "clarify_count_exploration", f"Intent: {intent}, Count: {clarify_count}/2")
             
-            if clarify_count >= 3:
+            if clarify_count >= 2:
                 self.memstore.set_flag(user_id, f"{intent}_clarify_count", 0)
                 
                 escalate_msg = "Baik kak, sepertinya perlu pengecekan lebih detail oleh teknisi kami.  Saya bantu jadwalkan kunjungan teknisi ya."
@@ -3669,7 +3706,7 @@ class ConversationEngine:
                         short_log(self.logger, user_id, "additional_complaint_after_pending_trigger", 
                                  f"Additional complaint '{python_additional}' detected right after pending triggered")
                         
-                        ack_msg = f"Baik Kak, keluhan '{complaint_text}' juga sudah saya catat."
+                        ack_msg = f"Baik kak, untuk keluhan '{complaint_text}' juga sudah kami terima."
                         self.memstore.append_history(user_id, "bot", ack_msg)
                         
                         name_question = self.data_collector.generate_question(user_id, "name")
@@ -3729,7 +3766,7 @@ class ConversationEngine:
                     }
                     complaint_text = complaint_names.get(detected_intent, detected_intent)
                     
-                    ack_msg = f"Baik Kak, keluhan '{complaint_text}' sudah kami catat. Untuk saat ini kita selesaikan dulu data collection untuk keluhan sebelumnya ya."
+                    ack_msg = f"Baik kak, keluhan '{complaint_text}' sudah kami terima. Untuk saat ini kita selesaikan dulu data collection untuk keluhan sebelumnya ya."
                     self.memstore.append_history(user_id, "bot", ack_msg)
                     
                     return self._log_and_return(user_id, {
@@ -3738,7 +3775,7 @@ class ConversationEngine:
                         "status": "open"
                     }, {"context": "new_complaint_queued", "queued_intent": detected_intent})
                 else:
-                    ack_msg = "Baik Kak, keluhan baru akan kami catat. Untuk saat ini data collection masih berjalan untuk keluhan sebelumnya."
+                    ack_msg = "Baik kak, keluhan baru akan kami terima. Untuk saat ini data collection masih berjalan untuk keluhan sebelumnya."
                     self.memstore.append_history(user_id, "bot", ack_msg)
                     return self._log_and_return(user_id, {
                         "bubbles": [{"text": ack_msg}], 
@@ -3773,7 +3810,7 @@ class ConversationEngine:
                         field_map = {"name": "nama", "product": "produk", "address": "alamat"}
                         field_name = field_map.get(next_field, "data")
                         
-                        ack_msg = f"Baik Kak, keluhan '{complaint_text}' sudah saya catat. Sekarang boleh dilanjut {field_name}nya?"
+                        ack_msg = f"Baik kak, keluhan '{complaint_text}' sudah kami terima. Sekarang boleh dilanjut {field_name}nya?"
                         self.memstore.append_history(user_id, "bot", ack_msg)
                         
                         return self._log_and_return(user_id, {
@@ -3794,7 +3831,7 @@ class ConversationEngine:
                     missing_field = off_topic_info.get("missing_field", "name")
                     field_map = {"name": "nama", "product": "produk", "address": "alamat"}
                     field_name = field_map.get(missing_field, "data")
-                    msg = f"Baik {salutation}, keluhan sudah saya catat dan akan kami proses setelah data lengkap. Boleh kita lanjutkan pengisian {field_name}nya dulu?"
+                    msg = f"Baik {salutation}, keluhan sudah kami terima dan akan kami proses setelah data lengkap. Boleh kita lanjutkan pengisian {field_name}nya dulu?"
                     
                     self.memstore.append_history(user_id, "bot", msg)
                     return self._log_and_return(user_id, {"bubbles": [{"text": msg}], "next": "await_reply", "status": "open"}, {"context": "data_collection_off_topic_new_complaint"})
@@ -3839,7 +3876,7 @@ class ConversationEngine:
                     field_name = field_map.get(missing_field, "data")
                     
                     if message_type == "complaint":
-                        msg = f"Baik {salutation}, keluhan sudah saya catat dan akan kami proses setelah data lengkap. Boleh kita lanjutkan pengisian {field_name}nya dulu?"
+                        msg = f"Baik {salutation}, keluhan sudah kami terima dan akan kami proses setelah data lengkap. Boleh kita lanjutkan pengisian {field_name}nya dulu?"
                     elif message_type == "question":
                         msg = f"Baik {salutation}, pertanyaan akan saya jawab setelah data lengkap. Boleh kita selesaikan pengisian {field_name}nya dulu?"
                     else:

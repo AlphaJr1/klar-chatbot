@@ -22,9 +22,9 @@
         "Kalau sudah normal kembali, saya tutup laporannya ya kak."
       ],
       "closing_pending": [
-        "Baik kak, saya teruskan ke teknisi ya.",
-        "Kasusnya saya proses untuk dicek teknisi ya kak.",
-        "Saya bantu jadwalkan teknisi untuk pengecekan ya kak."
+        "Baik kak, kami bantu jadwalkan teknisi untuk pengecekan ya.",
+        "Kami jadwalkan teknisinya untuk dicek lebih lanjut ya kak.",
+        "Baik kak, kami proses jadwal teknisi untuk ke tempat kakak ya."
       ],
       "transition": [
         "Baik kak, kita cek satu hal lagi ya.",
@@ -64,8 +64,8 @@
           "Kalau sudah berfungsi, saya tutup tiket ya kak."
         ],
         "pending_templates": [
-          "Baik kak, saya teruskan ke teknisi ya.",
-          "Sepertinya perlu dicek teknisi, saya bantu proses ya kak."
+          "Baik kak, kami bantu jadwalkan teknisi ya.",
+          "Sepertinya perlu dicek teknisi, kami jadwalkan ke tempat kakak ya."
         ],
         "expected_result": [
           "yes",
@@ -102,7 +102,7 @@
         ],
         "pending_templates": [
           "Baik kak, sepertinya alat perlu dicek teknisi.",
-          "Saya bantu teruskan ke teknisi ya kak."
+          "Kami bantu jadwalkan teknisi untuk pengecekan ya kak."
         ],
         "expected_result": [
           "yes",
@@ -143,9 +143,9 @@
           "Kalau sudah normal kembali, saya tutup tiket ya kak."
         ],
         "pending_templates": [
-          "Wah sepertinya power supply atau receivernya bermasalah kak, kami coba jadwalkan teknisi ke tempat kakak ya.",
-          "Jika MCB sudah diaktifkan namun unit masih tidak hidup, indikasinya ada kerusakan pada modul daya/receiver. Kami bantu jadwalkan dengan teknisi ya kak, apakah bersedia?",
-          "Sepertinya ada masalah dengan power supply ata receiver pada alaatnya kak, kami coba jadwalkan teknisinya ya kak"
+          "Wah sepertinya power supply atau receivernya bermasalah kak, kami jadwalkan teknisi ke tempat kakak ya.",
+          "Jika MCB sudah diaktifkan namun unit masih tidak hidup, indikasinya ada kerusakan pada modul daya/receiver. Kami jadwalkan teknisi untuk pengecekan ya kak.",
+          "Sepertinya ada masalah dengan power supply atau receiver pada alatnya kak, kami jadwalkan teknisinya ya kak"
         ],
         "expected_result": [
           "yes",
@@ -187,8 +187,8 @@
           "Kita tersedia carbon filter yang cocok untuk unit ini kak."
         ],
         "pending_templates": [
-          "Baik kak, saya teruskan untuk proses teknisi ya.",
-          "Saya bantu proses untuk ditindaklanjuti teknisi kak."
+          "Baik kak, kami jadwalkan teknisi untuk penggantian filternya ya.",
+          "Kami bantu jadwalkan teknisi untuk ditindaklanjuti kak."
         ],
         "expected_result": [
           "yes",
@@ -226,9 +226,9 @@
           "Bunyi tersebut berarti alat kak berfungsi dengan normal kak, tapi jika bunyinya sering dan terus-menerus berarti ada kotoran yang nyangkut dan perlu dibersihkan."
         ],
         "pending_templates": [
-          "Bunyi sering menandakan ada kotoran yang tersangkut di pre-filter/collector cell. Saya bantu jadwalkan teknisi untuk pembersihan unit ya kak.",
-          "Bunyi berulang dan sering biasanya karena debu menumpuk. Saya jadwalkan teknisi untuk bantu bersihkan alatnya ya kak.",
-          "Sepertinya unitnya perlu dibersihkan kak, karena ada kotoran yang menyangkut. Saya bantu jadwalkan teknisinya ya."
+          "Bunyi sering menandakan ada kotoran yang tersangkut di pre-filter/collector cell. Kami jadwalkan teknisi untuk pembersihan unit ya kak.",
+          "Bunyi berulang dan sering biasanya karena debu menumpuk. Kami jadwalkan teknisi untuk bersihkan alatnya ya kak.",
+          "Sepertinya unitnya perlu dibersihkan kak, karena ada kotoran yang menyangkut. Kami jadwalkan teknisinya ya."
         ],
         "expected_result": [
           "sering",
