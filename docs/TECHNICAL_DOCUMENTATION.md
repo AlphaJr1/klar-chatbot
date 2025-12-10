@@ -2,7 +2,8 @@
 
 **Version**: 1.0  
 **Date**: December 10, 2025  
-**Status**: Development
+**Status**: Development  
+**Repository**: [https://github.com/AlphaJr1/klar-chatbot](https://github.com/AlphaJr1/klar-chatbot)
 
 ---
 
